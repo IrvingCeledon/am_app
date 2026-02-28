@@ -1,0 +1,32 @@
+/* ===== Start (blue) ===== */
+#start_btn, #run_btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+#start_btn:hover, #run_btn:hover {
+    background-color: #1976D2;
+}
+
+#start_btn:pressed, #run_btn:pressed {
+    background-color: #0D47A1;
+}
+
+/* ===== Settings ===== */
+#settings_btn {
+    border: 1px solid #000001;            
+}
+
+/* ===== Exit (red) ===== */
+#exit_btn, #return_btn {
+    background-color: #f44336;
+    color: white;
+}
+
+#exit_btn:hover, #return_btn:hover {
+    background-color: #d32f2f;
+}
+
+#exit_btn:pressed, #return_btn:pressed {
+    background-color: #b71c1c;
+}

@@ -1,0 +1,16 @@
+/* ===== Base button ===== */
+QPushButton {
+    border-radius: 6px;
+    font-size: 16px;
+    padding: 6px;
+}
+
+/* Global hover */
+QPushButton:hover {
+    background-color: #d0d0d0;
+}
+
+/* Click */
+QPushButton:pressed {
+    background-color: #bdbdbd;
+}
