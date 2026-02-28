@@ -1,7 +1,4 @@
-from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
-    QWidget, 
-    QPushButton, 
     QVBoxLayout, 
     QHBoxLayout, 
     QLabel, 
@@ -10,20 +7,19 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox
 )
 
-class GAControls(QWidget):
-    runRequested = Signal(dict)
-    paramsChanged = Signal(dict)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._build_ui()
-        self._connect_signals()
+class GAControls:
+    def __init__(self):
+        super().__init__()
         
-    def _build_ui(self):
-        upper_controls = QHBoxLayout(self)
+    def build_layout(self):
+        upper_controls = QHBoxLayout()
+        upper_controls.setSpacing(5)
+
         upper_controls.addLayout( self._build_size_section() )
-        upper_controls.addLayout( self._build_domains_section() ) 
-        upper_controls.addLayout( self._build_rates_section() ) 
+        upper_controls.addLayout( self._build_domains_section() )
+        upper_controls.addLayout( self._build_rates_section() )
+
+        return upper_controls
         
     def _build_size_section(self):    
         size_section = QVBoxLayout()
@@ -168,44 +164,3 @@ class GAControls(QWidget):
             "crossover": self.crossover_spin.value(),
             "mutation": self.mutation_spin.value()
         }
-        
-    def _emit_params_changed(self):
-        self.paramsChanged.emit(self.get_params())
-        
-    def _connect_signals(self):
-        spinboxes = [
-        self.generations_spin,
-        self.population_spin,
-        self.bits_spin,
-        self.x_min, self.x_max,
-        self.y_min, self.y_max,
-        self.selection_spin,
-        self.crossover_spin,
-        self.mutation_spin
-        ]
-
-        for s in spinboxes:
-            s.valueChanged.connect(self._emit_params_changed)
-
-        self.fitness_combo.currentIndexChanged.connect(
-            self._emit_params_changed
-        )
-                
-    def build_run_button(self):
-        self.run_btn = QPushButton("Run")
-        self.run_btn.setObjectName("run_btn")
-
-        self.run_btn.clicked.connect(
-            lambda: self.runRequested.emit(self.get_params())
-        )
-
-        return self.run_btn
-        
-"""
-def _connect_many(self, widgets, signal):
-    for w in widgets:
-        getattr(w, signal).connect(self._emit_params_changed)
-
-self._connect_many(spinboxes, "valueChanged")
-self._connect_many([self.fitness_combo], "currentIndexChanged")
-"""

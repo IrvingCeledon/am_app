@@ -1,27 +1,27 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QComboBox
+    QWidget, 
+    QSizePolicy, 
+    QVBoxLayout, 
+    QHBoxLayout, 
+    QPushButton, 
+    QLabel, 
+    QComboBox
 )
 
 from PySide6.QtCore import Signal
 
-from frontend.controllers.algorithms.ga_controller import GAController
 from frontend.ui_components.graphs.graph_container import GraphContainer
 from frontend.ui_components.controls.ga_controls import GAControls
 
 class RunPage(QWidget):
-    go_back = Signal()
+    runRequested = Signal(str, dict)
+    backRequested = Signal()
     graph_changed = Signal(str)
-    runRequested = Signal(dict)
     
-    def __init__(self, state, stack):
+    def __init__(self):
         super().__init__()
-
-        self.state = state
-        self.stack = stack
-        self.last_result = None
         
-        self.ga_controller = GAController()
+        self._last_result = None    # Just for draw 
         
         self._build_ui()
         self._connect_signals()
@@ -31,10 +31,15 @@ class RunPage(QWidget):
         upper_controls = QHBoxLayout()
         
         self.controls = GAControls()
+
         self.graph = GraphContainer()
-        
-        upper_controls.addLayout( self._build_main_section() )
-        upper_controls.addWidget(self.controls)
+        self.graph.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
+        )
+
+        upper_controls.addLayout( self._build_main_section(), 2 )
+        upper_controls.addLayout( self.controls.build_layout(), 6 )
 
         main_layout.addLayout(upper_controls)
         main_layout.addWidget(self.graph)
@@ -63,59 +68,57 @@ class RunPage(QWidget):
         main_section.addLayout(graphs)        
         
         # Buttons:
+        self.run_btn = QPushButton("Run")
+        self.run_btn.setObjectName("run_btn")
         self.return_btn = QPushButton("Return")
         self.return_btn.setObjectName("return_btn")
         
-        main_section.addWidget(self.controls.build_run_button())
-        main_section.addWidget(self.return_btn)    
-        
+        main_section.addWidget(self.run_btn)
+        main_section.addWidget(self.return_btn)   
+
         return main_section
-
-    def _update_graph_by_selection(self, text):
-        if not self.last_result:
-            self.graphs_combo.setCurrentIndex(0)
-            return  # There is no data
-
-        if text == "none":
-            self.graph.plot_fitness(self.last_result.bestFitnesses)
-        elif text == "all":
-            self.graph.plot_populations_all([
-                (self.last_result.initialPopulation, "blue", "Initial"),
-                (self.last_result.midPopulation, "orange", "Mid"),
-                (self.last_result.finalPopulation, "green", "Final"),
-            ])
-        elif text == "initial":
-            self.graph.plot_population(
-                self.last_result.initialPopulation,'blue', "Initial Population"
-            )
-        elif text == "mid":
-            self.graph.plot_population(
-                self.last_result.midPopulation, 'orange', "Mid Population"
-            )
-        elif text == "final":
-            self.graph.plot_population(
-                self.last_result.finalPopulation, 'green', "Final Population"
-            )
-            
-    def _on_result_ready(self, result):
-        self.last_result = result
-
-        self.graphs_combo.setCurrentIndex(0)
-
-        self.graph.plot_fitness(result.bestFitnesses)    
         
     def _connect_signals(self):
-        self.return_btn.clicked.connect(
-            lambda: self.stack.setCurrentIndex(0)
+        self.run_btn.clicked.connect(
+            lambda: self.runRequested.emit(
+                self.algorithm_combo.currentText(),
+                self.controls.get_params()
+            )
         )
+
+        self.return_btn.clicked.connect(self.backRequested.emit)
+
         self.graphs_combo.currentTextChanged.connect(
             self._update_graph_by_selection
         )
-        
-        self.controls.runRequested.connect(
-            self.ga_controller.run_with_params
-        )
 
-        self.ga_controller.resultReady.connect(
-            self._on_result_ready
-        )   
+    def show_result(self, result):
+        self._last_result = result
+        self.graphs_combo.setCurrentIndex(0)
+        self.graph.plot_fitness(result.metrics["bestFitnesses"])
+        
+    def _update_graph_by_selection(self, text):
+        if not self._last_result:
+            self.graphs_combo.setCurrentIndex(0)
+            return
+
+        snaps = self._last_result.snapshots
+
+        if text == "none":
+            self.graph.plot_fitness(self._last_result.metrics["bestFitnesses"])
+
+        elif text == "all":
+            self.graph.plot_populations_all([
+                (snaps["initial"], "blue", "Initial"),
+                (snaps["mid"], "orange", "Mid"),
+                (snaps["final"], "green", "Final"),
+            ])
+
+        elif text == "initial":
+            self.graph.plot_population(snaps["initial"], "blue", "Initial")
+
+        elif text == "mid":
+            self.graph.plot_population(snaps["mid"], "orange", "Mid")
+
+        elif text == "final":
+            self.graph.plot_population(snaps["final"], "green", "Final")

@@ -54,13 +54,14 @@ build_backend() {
 run_app() {
     ensure_venv
     echo "Running frontend..."
-    py -m frontend.main
+    py -m frontend.main "$@"
 }
 
 #######################################
 clean_build() {
-    echo "Cleaning build..."
+    echo "Cleaning build and native modules..."
     rm -rf "$BUILD_DIR"
+    find frontend/native -type f -name "*.so" -delete
 }
 
 #######################################
@@ -84,6 +85,7 @@ Usage: ./dev.sh [command]
 Commands:
   build        -> compile backend
   run          -> run app
+  run-debug    -> run app with debug
   deps         -> install dependencies
   all          -> deps + build + run
   clean        -> remove build + cache
@@ -97,6 +99,7 @@ EOF
 case "${1:-all}" in
     build) build_backend ;;
     run)   run_app ;;
+    run-debug)	run_app --debug ;;
     deps)  install_deps ;;
     all)
         install_deps

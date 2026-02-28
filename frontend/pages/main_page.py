@@ -1,13 +1,15 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSizePolicy
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton
 from frontend.utils import centered_in_h
 from frontend.utils import set_expandable_width_lim
+from PySide6.QtCore import Signal
 
 class MainPage(QWidget):
-    def __init__(self, stack):
+    go_to_settings = Signal()
+    go_to_run_page = Signal()
+    
+    def __init__(self):
         super().__init__()
-        
-        self.stack = stack      
         
         self._build_ui()
         self._connect_signals()
@@ -45,5 +47,6 @@ class MainPage(QWidget):
         set_expandable_width_lim(btn)
     
     def _connect_signals(self):
-        self.start_btn.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        self.settings_btn.clicked.connect(self.go_to_settings.emit)
+        self.start_btn.clicked.connect(self.go_to_run_page.emit)
         self.exit_btn.clicked.connect(QApplication.quit)
