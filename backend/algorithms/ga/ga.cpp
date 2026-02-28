@@ -30,7 +30,7 @@ void GA::initialize()
       configuration.bits
     );
         
-    // Evaluate -> This is done here because is more efficent than call evaluate, and starts another loop, inmediatly after initialization.
+// Evaluate -> This is done here because is more efficent than call evaluate, and starts another loop, inmediatly after initialization.
     individual.evaluate(configuration.fitness);
   }
 }
@@ -72,23 +72,31 @@ void GA::crossover()
     std::uniform_int_distribution<size_t> parent_dist(0, n_keep - 1);
     std::uniform_int_distribution<int> point_dist(1, configuration.bits - 1);
     
+    // This is single point crossover.
     while ( pop.size() < target )
     {
+      // Select parents randomly.
       const auto& p1 = pop[parent_dist(rng)];
       const auto& p2 = pop[parent_dist(rng)];
       
-      Individual child;
+      Individual child; // New possible child.
       
       if ( prob(rng) < configuration.rates.crossover )
       {
+        // Selects a random cut point.
         int point = point_dist(rng);
         
-        uint16_t mask_low = (1u << point) - 1;
-        uint16_t mask_high = ~mask_low;
-        
+        // This emulate the cut procces with left shift operator (this cut in the exact pint) - 1 for p1.
+        // And the cut point is made it with the negation of mask_low.
+        // Example with: bit = 8, point = 3
+        uint16_t mask_low = (1u << point) - 1;  // 1 << 3 = 00001000 - 1 = 00000111
+        uint16_t mask_high = ~mask_low; // ~mask_low = 11111000
+
+        // Example with: p1 = 10110110, p2 = 01001001
         uint16_t x = 
-          (p1.getChromosome().getX() & mask_high) |
-          (p2.getChromosome().getX() & mask_low);
+          (p1.getChromosome().getX() & mask_high) | // = 10110000
+          (p2.getChromosome().getX() & mask_low);   // = 00000001
+          // 10110000 | 00000001 = 10110001
 
         uint16_t y =
           (p1.getChromosome().getY() & mask_high) |
@@ -102,14 +110,6 @@ void GA::crossover()
         child = p1;
       }
 
-      child.decode(configuration.domains.x.min,
-                   configuration.domains.x.max,
-                   configuration.domains.y.min,
-                   configuration.domains.y.max,
-                   configuration.bits);
-
-      child.evaluate(configuration.fitness);
-
       pop.push_back(child);
     }
 }
@@ -117,7 +117,7 @@ void GA::crossover()
 void GA::mutate()
 {
   if (pop.size() <= 1) return;
-  
+  // Calls the mutation method for each individual, with the current rng and bits.
   for (size_t i = 1; i < pop.size(); i++) {
     pop[i].getChromosome().mutate( rng, configuration.rates.mutation, configuration.bits );
   }
@@ -156,7 +156,7 @@ RunResult GA::run()
     initialize(); // I don't evaluate here, because i do it in initialize.
     sort();
 
-    // Initial pop:
+    // Saves Initial pop:
     for (const auto& ind : pop)
         result.initialPopulation.emplace_back(
             ind.getDecodedX(),
@@ -186,7 +186,7 @@ RunResult GA::run()
         }
     }
 
-    // Final pop:
+    // Saves Final pop:
     for (const auto& ind : pop)
         result.finalPopulation.emplace_back(
             ind.getDecodedX(),

@@ -1,5 +1,5 @@
-from .ga_controller import GAController
+from .app_controller import AppController
 
 __all__ = [
-    "GAController"
+    "AppController"
 ]

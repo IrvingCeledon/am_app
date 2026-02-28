@@ -43,6 +43,7 @@ class GA
     
     // update_config(config) -> on hold
     RunResult run();
+    void update_config(const GAConfig& config) { configuration = config; }
 };
 
 // Global declaration of cost functions

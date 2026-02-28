@@ -2,10 +2,10 @@
 set -euo pipefail
 
 #######################################
-# Configuración
+# Config
 #######################################
 PYTHON=python3
-BUILD_DIR="backend/algorithms/ga/build"
+BUILD_DIR=build
 VENV_DIR=venv
 DATA_DIR=data
 
@@ -22,7 +22,7 @@ pip() { "$VENV_PIP" "$@"; }
 #######################################
 ensure_venv() {
     if [[ ! -d "$VENV_DIR" ]]; then
-        echo "Creando entorno virtual..."
+        echo "Creating virtual environment..."
         "$PYTHON" -m venv "$VENV_DIR"
     fi
 }
@@ -32,62 +32,62 @@ install_deps() {
     ensure_venv
 
     if [[ ! -f "$DEPS_FLAG" ]]; then
-        echo "Instalando dependencias..."
+        echo "Installing dependencies..."
+
         pip install --upgrade pip
-        pip install PySide6 pybind11 mplcursors
+        pip install PySide6 mplcursors
 
         touch "$DEPS_FLAG"
     else
-        echo "Dependencias ya instaladas"
+        echo "Dependencies already installed"
     fi
 }
 
 #######################################
 build_backend() {
-    echo "Compilando backend v1..."
-    cmake -S backend/algorithms/ga -B backend/algorithms/ga/build
-    cmake --build backend/algorithms/ga/build -j$(nproc)
+    echo "Compiling backend..."
+    cmake -S backend -B "$BUILD_DIR"
+    cmake --build "$BUILD_DIR" -j"$(nproc)"
 }
 
 #######################################
 run_app() {
     ensure_venv
-    echo "Ejecutando frontend..."
+    echo "Running frontend..."
     py -m frontend.main
 }
 
 #######################################
 clean_build() {
-    echo "Limpiando build..."
+    echo "Cleaning build..."
     rm -rf "$BUILD_DIR"
 }
 
 #######################################
 clean_cache() {
-    echo "Limpiando cache de Python..."
+    echo "Cleaning Python cache..."
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
     find . -type f -name "*.pyc" -delete
 }
 
 #######################################
 purge() {
-    echo "Eliminando build, cache, data y venv..."
-    rm -rf "$BUILD_DIR" "$VENV_DIR"
-    rm -f "$DATA_DIR"/*.txt
+    echo "Removing build, cache, data and venv..."
+    rm -rf "$BUILD_DIR" "$DATA_DIR" "$VENV_DIR"
 }
 
 #######################################
 usage() {
     cat <<EOF
-Uso: ./dev_v1.sh [command]
+Usage: ./dev.sh [command]
 
 Commands:
-  build        -> compila backend
-  run          -> ejecuta la app
-  deps         -> instala dependencias
+  build        -> compile backend
+  run          -> run app
+  deps         -> install dependencies
   all          -> deps + build + run
-  clean        -> elimina build + cache
-  purge        -> elimina TODO (incluyendo venv)
+  clean        -> remove build + cache
+  purge        -> remove EVERYTHING (including venv)
 EOF
 }
 
@@ -110,4 +110,3 @@ case "${1:-all}" in
     purge) purge ;;
     *) usage ;;
 esac
-

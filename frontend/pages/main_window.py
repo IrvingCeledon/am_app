@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QStackedWidget, QVBoxLayout, QLabel, QPushButton
-from frontend.state import AppState
-from .main_page import MainPage
-from .menu_page import MenuPage
-from .run_page import RunPage
+from frontend import AppState
+from frontend.pages import MainPage
+from frontend.pages import MenuPage
+from frontend.pages import RunPage
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,10 +10,10 @@ class MainWindow(QMainWindow):
         
         self.state = AppState()
         
-        # self.resize(700, 500)    
-        self.setWindowTitle("Metaheuristic Algorithm Simulator V2") 
+        # self.resize(700, 500)
+        self.setWindowTitle("Metaheuristic Algorithm Simulator V2.0")
         self.setMinimumSize(700, 500)
-
+        
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
         
