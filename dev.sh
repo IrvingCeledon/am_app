@@ -113,6 +113,19 @@ purge() {
 }
 
 #######################################
+dump_code() {
+    echo "Exporting codebase to $DATA_DIR/full_codebase.txt..."
+    
+    # Aseguramos que el directorio data exista antes de guardar el archivo
+    mkdir -p "$DATA_DIR"
+    
+    # Tu comando original, adaptado para apuntar a $DATA_DIR
+    find backend frontend models services \( -path "*/build/*" -o -path "*/.git/*" -o -path "*/venv/*" -o -path "*/.venv/*" -o -path "*/__pycache__/*" -o -path "*/.idea/*" -o -path "*/data/*" \) -prune -o -type f \( -name "*.cpp" -o -name "*.hpp" -o -name "*.py" \) -print | xargs awk 'FNR==1{print "\n\n// " "="x50 "\n// FILE: " FILENAME "\n// " "="x50 "\n"}1' > "$DATA_DIR/full_codebase.txt"
+    
+    echo "Done! Check $DATA_DIR/full_codebase.txt"
+}
+
+#######################################
 usage() {
     cat <<EOF
 Usage: ./dev.sh [command]
@@ -124,11 +137,14 @@ Commands:
   memcheck     -> run app with valgrind memory leak detection
   asan         -> build + run with AddressSanitizer (fast memory checks)
   deps         -> install dependencies
+  dump         -> export codebase to a single text file inside data/
   all          -> deps + build + run
   clean        -> remove build + cache
   purge        -> remove EVERYTHING (including venv)
 EOF
 }
+
+trap 'echo "BOAT GOES BINTED!!!!!"' EXIT
 
 #######################################
 # Entry point
@@ -136,7 +152,7 @@ EOF
 case "${1:-all}" in
     build) build_backend ;;
     run)   run_app ;;
-    run-debug)	run_app --debug ;;
+    run-debug)    run_app --debug ;;
     memcheck) run_valgrind ;;
     asan)
         install_deps
@@ -144,6 +160,7 @@ case "${1:-all}" in
         run_asan
     ;;
     deps)  install_deps ;;
+    dump)  dump_code ;;
     all)
         install_deps
         build_backend

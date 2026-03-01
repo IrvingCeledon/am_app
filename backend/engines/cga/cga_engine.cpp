@@ -38,13 +38,15 @@ void CGAEngine::initialize()
             ind.genes()[d] = dist(rng);
         }
 
-        ind.setCost(this->configuration.fitness(ind.genes()));
+        ind.setCost(this->evaluate_fitness(ind.genes()));
     }
+    
+    std::sort(this->pop.begin(), this->pop.end());
 }
 
 void CGAEngine::evaluate() {
     for (auto& ind : this->pop) {
-        ind.setCost(this->configuration.fitness(ind.genes()));
+        ind.setCost(this->evaluate_fitness(ind.genes()));
     }
 }
 

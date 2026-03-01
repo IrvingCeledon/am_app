@@ -74,6 +74,7 @@ class GAControls(Controls):
             "y_min": self.y_min.value(),
             "y_max": self.y_max.value(),
             "fitness": self.fitness_combo.currentData(),
+            "minimize": self.opt_type_combo.currentData(),
             "selection": self.selection_spin.value(),
             "crossover": self.crossover_spin.value(),
             "mutation": self.mutation_spin.value(),

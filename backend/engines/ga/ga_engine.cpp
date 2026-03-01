@@ -48,14 +48,16 @@ void GAEngine::initialize()
         }
 
         decode_individual(ind);
-        ind.setCost(this->configuration.fitness(ind.values()));
+        ind.setCost(this->evaluate_fitness(ind.values()));
     }
+    
+    std::sort(this->pop.begin(), this->pop.end());
 }
 
 void GAEngine::evaluate() {
     for (auto& ind : this->pop) {
         decode_individual(ind);
-        ind.setCost(this->configuration.fitness(ind.values()));
+        ind.setCost(this->evaluate_fitness(ind.values()));
     }
 }
 

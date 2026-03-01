@@ -139,6 +139,7 @@ class RunPage(QWidget):
 
         internal_data = self.graphs_combo.itemData(index)
         snaps = self._last_result.snapshots
+        params = self._last_result.params # <--- Extraemos los parámetros
 
         if internal_data == "none":
             self.graph.plot_fitness(self._last_result.metrics["bestFitnesses"])
@@ -149,16 +150,18 @@ class RunPage(QWidget):
                 plots.append((snaps["mid"], "orange", "Mid"))
             plots.append((snaps["final"], "green", "Final"))
 
-            self.graph.plot_populations_all(plots)
+            # Pasamos params
+            self.graph.plot_populations_all(plots, params)
 
         elif internal_data == "initial":
-            self.graph.plot_population(snaps["initial"], "blue", "Initial")
+            # Pasamos params
+            self.graph.plot_population(snaps["initial"], "blue", "Initial", params)
 
         elif internal_data == "mid":
-            self.graph.plot_population(snaps["mid"], "orange", "Mid")
+            self.graph.plot_population(snaps["mid"], "orange", "Mid", params)
 
         elif internal_data == "final":
-            self.graph.plot_population(snaps["final"], "green", "Final")
+            self.graph.plot_population(snaps["final"], "green", "Final", params)
 
     def _on_algorithm_changed(self, algorithm: str):
         if algorithm in self.algorithms_registry: 

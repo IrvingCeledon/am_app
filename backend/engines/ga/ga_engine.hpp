@@ -2,10 +2,10 @@
 
 #include <random>
 #include "../../evo_core/binary_individual.hpp"
-#include "../engine_base.hpp"
+#include "../genetic_engine_base.hpp"
 #include "ga_config.hpp"
 
-class GAEngine : public EngineBase<BinaryIndividual, GAConfig>
+class GAEngine : public GeneticEngineBase<BinaryIndividual, GAConfig>
 {
 protected: 
     void initialize() override;
@@ -24,5 +24,5 @@ private:
     
 public:
     explicit GAEngine(const GAConfig& config) 
-        : EngineBase<BinaryIndividual, GAConfig>(config) {}
+        : GeneticEngineBase<BinaryIndividual, GAConfig>(config) {}
 };

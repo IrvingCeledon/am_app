@@ -11,9 +11,10 @@ class ABCController(BaseController):
 
     def _update_config(self, p: dict):
         self._update_base_config(self.config, p)
+        self.config.use_gbest = p["use_gbest"]
         self.config.limit = p["limit"]
         
-    def run_with_params(self, params: dict):
+    def run_with_params(self, params: dict): 
         logger.debug("Updating ABC config")
         self._update_config(params)
 

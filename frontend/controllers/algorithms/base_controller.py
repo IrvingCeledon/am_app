@@ -40,6 +40,8 @@ class BaseController:
         config_obj.use_stagnation = p.get("use_stagnation", False)
         config_obj.stagnation_patience = p.get("stagnation_patience", 20)
         
+        config_obj.minimize = p.get("minimize", True)
+        
         if logger.isEnabledFor(logging.DEBUG):
             config_obj.verbosity = core_module.LogLevel.DEBUG
         else:

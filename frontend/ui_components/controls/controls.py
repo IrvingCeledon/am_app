@@ -32,7 +32,7 @@ class Controls:
         
         # Number of variables
         x_i_layout = QHBoxLayout()
-        self.x_i_spin = ui.create_spin_box(2, 10, 1, 2)
+        self.x_i_spin = ui.create_spin_box(1, 10, 1, 2)
         x_i_layout.addWidget(QLabel("x_i:"))
         x_i_layout.addWidget(self.x_i_spin)
         
@@ -47,12 +47,12 @@ class Controls:
         return size_section
         
     def _on_x_i_changed(self, value):
-        if value > 2:
-            self.y_min.setEnabled(False)
-            self.y_max.setEnabled(False)
-        else:
+        if value == 2:
             self.y_min.setEnabled(True)
             self.y_max.setEnabled(True)
+        else:
+            self.y_min.setEnabled(False)
+            self.y_max.setEnabled(False)
 
     def _build_domains_section(self):
         domains_section = QVBoxLayout()
@@ -86,6 +86,19 @@ class Controls:
 
         fitness_layout.addWidget(QLabel("Fitness:"))
         fitness_layout.addWidget(self.fitness_combo)
+        
+        opt_layout = QHBoxLayout()
+        self.opt_type_combo = QComboBox()
+        self.opt_type_combo.addItem("Minimize", userData=True)
+        self.opt_type_combo.addItem("Maximize", userData=False)
+        opt_layout.addWidget(QLabel("Optimization:"))
+        opt_layout.addWidget(self.opt_type_combo)
+
+        # Add sublayouts
+        domains_section.addLayout(x_layout)
+        domains_section.addLayout(y_layout)
+        domains_section.addLayout(fitness_layout)
+        domains_section.addLayout(opt_layout) # <--- Añade esto
 
         # Add sublayouts
         domains_section.addLayout(x_layout)
@@ -132,7 +145,6 @@ class Controls:
         
     def _on_fitness_changed(self, index):
         fitness_id = self.fitness_combo.itemData(index)
-        self.x_i_spin.setValue(2)
         
         if fitness_id in BENCHMARKS:
             data = BENCHMARKS[fitness_id]
@@ -143,3 +155,11 @@ class Controls:
             self.y_max.setValue(data["y_max"])
             
             self.target_spin.setValue(data["target"])
+            self.opt_type_combo.setCurrentIndex(0)
+            
+            if data["dims"] == "N":
+                self.x_i_spin.setEnabled(True)
+                self.x_i_spin.setValue(2)  
+            else:
+                self.x_i_spin.setValue(int(data["dims"]))
+                self.x_i_spin.setEnabled(False)

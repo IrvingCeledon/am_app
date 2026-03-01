@@ -16,12 +16,14 @@ PYBIND11_MODULE(abc_module, m) {
         .def_readwrite("populationSize", &ABCConfig::populationSize)
         .def_readwrite("domains", &ABCConfig::domains)
         .def_readwrite("fitness", &ABCConfig::fitness)
-        .def_readwrite("limit", &ABCConfig::limit)
         .def_readwrite("use_target", &ABCConfig::use_target)
         .def_readwrite("target_fitness", &ABCConfig::target_fitness)
         .def_readwrite("use_stagnation", &ABCConfig::use_stagnation)
         .def_readwrite("stagnation_patience", &ABCConfig::stagnation_patience)
-        .def_readwrite("verbosity", &ABCConfig::verbosity);
+        .def_readwrite("verbosity", &ABCConfig::verbosity)
+        .def_readwrite("use_gbest", &ABCConfig::use_gbest)
+        .def_readwrite("minimize", &ABCConfig::minimize)
+        .def_readwrite("limit", &ABCConfig::limit);
 
     py::class_<ABCEngine>(m, "ABCEngine")
         .def(py::init<const ABCConfig&>())

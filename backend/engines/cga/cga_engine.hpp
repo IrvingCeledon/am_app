@@ -2,10 +2,10 @@
 
 #include <random>
 #include "../../evo_core/real_individual.hpp"
-#include "../engine_base.hpp"
+#include "../genetic_engine_base.hpp"
 #include "cga_config.hpp"
 
-class CGAEngine : public EngineBase<RealIndividual, CGAConfig>
+class CGAEngine : public GeneticEngineBase<RealIndividual, CGAConfig>
 {
 protected:
     void initialize() override;
@@ -23,5 +23,5 @@ private:
 
 public: 
     explicit CGAEngine(const CGAConfig& config) 
-        : EngineBase<RealIndividual, CGAConfig>(config) {}
+        : GeneticEngineBase<RealIndividual, CGAConfig>(config) {}
 };
