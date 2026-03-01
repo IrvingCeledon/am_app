@@ -1,38 +1,28 @@
 #pragma once
 
 #include <random>
-#include "../../evo_core/population.hpp"
 #include "../../evo_core/binary_individual.hpp"
+#include "../engine_base.hpp"
 #include "ga_config.hpp"
 
-class GAEngine
+class GAEngine : public EngineBase<BinaryIndividual, GAConfig>
 {
+protected: 
+    void initialize() override;
+    void evaluate() override;
+    void selection() override;
+    void crossover() override;
+    void mutate() override;
+    void save_history(std::vector<Genome>& target) override;
+
 private:
     std::mt19937 rng{ std::random_device{}() };
-    GAConfig configuration;
-    Population<BinaryIndividual> pop;
 
     // Algorithm's intern methods
     uint32_t randGene();
     void decode_individual(BinaryIndividual&);
-
-    // Generational phases
-    void initialize();
-    void evaluate();
-    void selection();
-    void crossover();
-    void mutate();
-
-    // Helper to save different populations results
-    void save_history(std::vector<Genome>&);
-    bool check_stopping_criteria(size_t&, double&, double);
-
-public: 
+    
+public:
     explicit GAEngine(const GAConfig& config) 
-        : configuration(config),
-          pop(config.populationSize)
-    {}
-
-    // Main entry point
-    RunResult run();
+        : EngineBase<BinaryIndividual, GAConfig>(config) {}
 };

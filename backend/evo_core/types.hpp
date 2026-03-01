@@ -2,6 +2,23 @@
 
 #include <vector>
 #include <functional>
+#include <string> // Asegúrate de incluir string
+
+// ==========================================
+// Logging Types (Matching Python logging levels)
+// ==========================================
+
+enum class LogLevel : int {
+    DEBUG_LVL = 10,
+    INFO_LVL = 20,
+    WARNING_LVL = 30,
+    ERROR_LVL = 40
+};
+
+struct LogEntry {
+    LogLevel level;
+    std::string message;
+};
 
 // ==========================================
 // Mathematical Types (Space R^n)
@@ -46,4 +63,5 @@ struct RunResult {
     std::vector<Genome> initialPopulation;
     std::vector<Genome> midPopulation;
     std::vector<Genome> finalPopulation;
+    std::vector<LogEntry> logs;
 };

@@ -1,38 +1,27 @@
 #pragma once
 
 #include <random>
-#include <vector>
-#include "../../evo_core/population.hpp"
 #include "../../evo_core/real_individual.hpp"
+#include "../engine_base.hpp"
 #include "cga_config.hpp"
 
-class CGAEngine
+class CGAEngine : public EngineBase<RealIndividual, CGAConfig>
 {
+protected:
+    void initialize() override;
+    void evaluate() override;
+    void selection() override;
+    void crossover() override;
+    void mutate() override;
+    void save_history(std::vector<Genome>& target) override;
+
 private:
     std::mt19937 rng{ std::random_device{}() };
-    CGAConfig configuration;
-    Population<RealIndividual> pop;
 
     // Internal helper to keep values ​​within limits
     void clamp_individual(RealIndividual& ind);
 
-    // Generational phases
-    void initialize();
-    void evaluate();
-    void selection();
-    void crossover();
-    void mutate();
-
-    // Helper to save different populations results
-    void save_history(std::vector<Genome>&);
-    bool check_stopping_criteria(size_t&, double&, double);
-
 public: 
     explicit CGAEngine(const CGAConfig& config) 
-        : configuration(config),
-          pop(config.populationSize)
-    {}
-
-    // Main entry point
-    RunResult run();
+        : EngineBase<RealIndividual, CGAConfig>(config) {}
 };

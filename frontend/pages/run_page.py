@@ -1,50 +1,72 @@
 from PySide6.QtWidgets import (
-    QWidget, 
+    QWidget,
     QStackedWidget,
-    QSizePolicy, 
-    QVBoxLayout, 
-    QHBoxLayout, 
-    QPushButton, 
-    QLabel, 
+    QSizePolicy,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QLabel,
     QComboBox
 )
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 
 from frontend.ui_components.graphs.graph_container import GraphContainer
 from frontend.ui_components.controls.ga_controls import GAControls
 from frontend.ui_components.controls.cga_controls import CGAControls
+
 
 class RunPage(QWidget):
     runRequested = Signal(str, dict)
     backRequested = Signal()
     graph_changed = Signal(str)
     
+    GRAPH_OPTIONS = [
+        ("none", "none"),
+        ("all", "all"),
+        ("initial", "initial"),
+        ("mid", "mid"),
+        ("final", "final")
+    ]
+
     def __init__(self):
         super().__init__()
-        
-        self.graph_options = [
-            ("none", "none"),
-            ("all", "all"),
-            ("initial", "initial"),
-            ("mid", "mid"),
-            ("final", "final")
-        ]
-        
-        self._last_result = None    # Just for draw 
-        
+
+        self._last_result = None    # Just for draw
+
         self._build_ui()
         self._connect_signals()
 
     def _build_ui(self):
         main_layout = QVBoxLayout(self)
         upper_controls = QHBoxLayout()
-        
-        self.controls_container = QHBoxLayout()
-        self.controls_container.setStretch(0, 6)
-        
-        self.controls = GAControls()
-        self.controls_container.addLayout(self.controls.build_layout())
+
+        # 1. Creamos el Stack (El mazo de cartas)
+        self.controls_stack = QStackedWidget()
+        self.controls_stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        # 2. Creamos y guardamos las instancias de los controles una sola vez
+        self.ga_controls = GAControls()
+        self.cga_controls = CGAControls()
+
+        # 2. GA Widget - Alineado arriba
+        self.ga_widget = QWidget()
+        ga_layout = self.ga_controls.build_layout()
+        ga_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.ga_widget.setLayout(ga_layout)
+
+        # 3. CGA Widget - Alineado arriba
+        self.cga_widget = QWidget()
+        cga_layout = self.cga_controls.build_layout()
+        cga_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.cga_widget.setLayout(cga_layout)
+
+        # 4. Añadimos las "cartas" al mazo
+        self.controls_stack.addWidget(self.ga_widget)
+        self.controls_stack.addWidget(self.cga_widget)
+
+        # 5. Definimos el control activo actual por defecto
+        self.controls = self.ga_controls
 
         self.graph = GraphContainer()
         self.graph.setSizePolicy(
@@ -52,48 +74,49 @@ class RunPage(QWidget):
             QSizePolicy.Policy.Expanding
         )
 
-        upper_controls.addLayout( self._build_main_section(), 2 )
-        upper_controls.addLayout( self.controls_container, 6 )
+        upper_controls.addLayout(self._build_main_section(), 2)
+        upper_controls.addWidget(self.controls_stack, 6)
 
-        main_layout.addLayout(upper_controls)
-        main_layout.addWidget(self.graph)
-        
+        main_layout.addLayout(upper_controls, 0)
+        main_layout.addWidget(self.graph, 1)
+
     def _build_main_section(self):
         main_section = QVBoxLayout()
+        main_section.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Algoritthms:
+        # Algorithms:
         algorithms = QHBoxLayout()
         self.algorithm_combo = QComboBox()
         self.algorithm_combo.addItems(["GA", "CGA"])
-        
+
         algorithms.addWidget(QLabel("Algorithm:"))
         algorithms.addWidget(self.algorithm_combo)
         main_section.addLayout(algorithms)
-        
+
         # Graphs:
         graphs = QHBoxLayout()
         self.graphs_combo = QComboBox()
-        
-        for label, internal in self.graph_options:
+
+        for label, internal in self.GRAPH_OPTIONS:
             self.graphs_combo.addItem(label, userData=internal)
-        
+
         graphs.addWidget(QLabel("See"))
         graphs.addWidget(self.graphs_combo)
         graphs.addWidget(QLabel("population"))
-        
-        main_section.addLayout(graphs)        
-        
+
+        main_section.addLayout(graphs)
+
         # Buttons:
         self.run_btn = QPushButton("Run")
         self.run_btn.setObjectName("run_btn")
         self.return_btn = QPushButton("Return")
         self.return_btn.setObjectName("return_btn")
-        
+
         main_section.addWidget(self.run_btn)
-        main_section.addWidget(self.return_btn)   
+        main_section.addWidget(self.return_btn)
 
         return main_section
-        
+
     def _connect_signals(self):
         self.run_btn.clicked.connect(
             lambda: self.runRequested.emit(
@@ -107,56 +130,46 @@ class RunPage(QWidget):
         self.graphs_combo.currentIndexChanged.connect(
             self._update_graph_by_selection
         )
-        
+
         self.algorithm_combo.currentTextChanged.connect(
             self._on_algorithm_changed
         )
 
     def show_result(self, result):
         self._last_result = result
-        
-        # 1. Verificamos si la población de en medio viene vacía
+
         has_mid_population = len(result.snapshots["mid"]) > 0
-        
-        # 2. Buscamos el índice de la opción "mid" en tu ComboBox
         mid_index = self.graphs_combo.findData("mid")
-        
+
         if mid_index != -1:
-            # 3. Habilitamos o deshabilitamos el ítem visualmente en el menú desplegable
             item = self.graphs_combo.model().item(mid_index)
             item.setEnabled(has_mid_population)
-            
-            # (Opcional) Si quieres ser muy pro, cambias el texto para que el usuario sepa por qué
+
             if has_mid_population:
                 self.graphs_combo.setItemText(mid_index, "mid")
             else:
                 self.graphs_combo.setItemText(mid_index, "mid (early stop)")
 
-        # 4. Reseteamos la vista a la gráfica de convergencia y dibujamos
         self.graphs_combo.setCurrentIndex(0)
         self.graph.plot_fitness(result.metrics["bestFitnesses"])
-        
-    # Ahora recibimos el index en lugar del text
+
     def _update_graph_by_selection(self, index):
         if not self._last_result or index == -1:
             self.graphs_combo.setCurrentIndex(0)
             return
 
-        # Extraemos el identificador interno puro ("mid", "none", "all", etc.)
         internal_data = self.graphs_combo.itemData(index)
         snaps = self._last_result.snapshots
 
-        # Evaluamos usando la data inmutable
         if internal_data == "none":
             self.graph.plot_fitness(self._last_result.metrics["bestFitnesses"])
 
         elif internal_data == "all":
-            # Filtramos 'mid' de 'all' si ocurrió un early stop para que no truene el graficador
             plots = [(snaps["initial"], "blue", "Initial")]
             if len(snaps["mid"]) > 0:
                 plots.append((snaps["mid"], "orange", "Mid"))
             plots.append((snaps["final"], "green", "Final"))
-            
+
             self.graph.plot_populations_all(plots)
 
         elif internal_data == "initial":
@@ -167,30 +180,11 @@ class RunPage(QWidget):
 
         elif internal_data == "final":
             self.graph.plot_population(snaps["final"], "green", "Final")
-            
+
     def _on_algorithm_changed(self, algorithm: str):
-        self._clear_controls()
-
         if algorithm == "GA":
-            self.controls = GAControls()
+            self.controls_stack.setCurrentWidget(self.ga_widget)
+            self.controls = self.ga_controls
         elif algorithm == "CGA":
-            self.controls = CGAControls()
-        else:
-            return
-
-        self.controls_container.addLayout( self.controls.build_layout() )
-        
-    def _clear_controls(self):
-        while self.controls_container.count():
-            item = self.controls_container.takeAt(0)
-
-            if item.layout():
-                self._delete_layout(item.layout())
-
-    def _delete_layout(self, layout):
-        while layout.count():
-            child = layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-            elif child.layout():
-                self._delete_layout(child.layout())
+            self.controls_stack.setCurrentWidget(self.cga_widget)
+            self.controls = self.cga_controls

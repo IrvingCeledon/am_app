@@ -3,31 +3,36 @@ import logging
 from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
+from frontend.paths import BASE_DIR, DATA_DIR, LOG_PATH
 from frontend.controllers.app_controller import AppController
-
-
-BASE_DIR = Path(__file__).parent.parent
-DATA_DIR = BASE_DIR / "data"
-LOG_PATH = DATA_DIR / "app.log"
 
 
 def setup_logging(debug: bool) -> None:
     DATA_DIR.mkdir(exist_ok=True)
 
+    formatter = logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    )
+
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.DEBUG if debug else logging.INFO)
+    stream_handler.setFormatter(formatter)
 
     file_handler = logging.FileHandler(LOG_PATH, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
 
-    logging.basicConfig(
-        level=logging.INFO, 
-        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-        handlers=[stream_handler, file_handler]
-    )
+    root = logging.getLogger()
+    root.setLevel(logging.WARNING) 
 
-    app_logger = logging.getLogger("frontend")
-    app_logger.setLevel(logging.DEBUG if debug else logging.INFO)
+    root.addHandler(stream_handler)
+    root.addHandler(file_handler)
+
+    # CAMBIO AQUÍ: Activamos explícitamente NUESTROS paquetes
+    my_level = logging.DEBUG if debug else logging.INFO
+    logging.getLogger("frontend").setLevel(my_level)
+    logging.getLogger("services").setLevel(my_level)
+    logging.getLogger("__main__").setLevel(my_level) # Para que se vean los logs de la función main()
 
 
 def main():

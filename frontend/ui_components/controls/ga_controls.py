@@ -1,10 +1,7 @@
-from PySide6.QtWidgets import (
-    QVBoxLayout, 
-    QHBoxLayout, 
-    QLabel, 
-    QSpinBox,
-    QDoubleSpinBox
-)
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel
+
+import frontend.utils as ui
+from frontend.utils import create_spin_box, create_double_spin_box
 
 from .controls import Controls
 
@@ -28,28 +25,19 @@ class GAControls(Controls):
 
         # Selection
         selection_layout = QHBoxLayout()
-        self.selection_spin = QDoubleSpinBox()
-        self.selection_spin.setRange(0.1, 1.0)  # 10% to 100%
-        self.selection_spin.setSingleStep(0.05) # single step of 5%
-        self.selection_spin.setValue(0.5)       # default of 50%
+        self.selection_spin = ui.create_double_spin_box(0.1, 1.0, 0.05, 0.5)
         selection_layout.addWidget(QLabel("Selection:"))
         selection_layout.addWidget(self.selection_spin)
 
         # Crossover
         crossover_layout = QHBoxLayout()
-        self.crossover_spin = QDoubleSpinBox()
-        self.crossover_spin.setRange(0.0, 1.0)  # 0% to 100%
-        self.crossover_spin.setSingleStep(0.05) # single step of 5%
-        self.crossover_spin.setValue(0.7)       # default of 70%
+        self.crossover_spin = ui.create_double_spin_box(0.0, 1.0, 0.05, 0.7)
         crossover_layout.addWidget(QLabel("Crossover:"))
         crossover_layout.addWidget(self.crossover_spin)
 
         # Mutation
         mutation_layout = QHBoxLayout()
-        self.mutation_spin = QDoubleSpinBox()
-        self.mutation_spin.setRange(0.0, 0.1)  # 0% to 10%
-        self.mutation_spin.setSingleStep(0.01) # single step of 1%
-        self.mutation_spin.setValue(0.01)       # default of 1%
+        self.mutation_spin = ui.create_double_spin_box(0.0, 0.1, 0.01, 0.01)
         mutation_layout.addWidget(QLabel("Mutation:"))
         mutation_layout.addWidget(self.mutation_spin)
 
@@ -65,10 +53,7 @@ class GAControls(Controls):
 
         # Bits
         bits = QHBoxLayout()
-        self.bits_spin = QSpinBox()
-        self.bits_spin.setRange(2, 32)
-        self.bits_spin.setSingleStep(2)
-        self.bits_spin.setValue(4)
+        self.bits_spin = ui.create_spin_box(2, 32, 2, 4)
         self.bits_label = QLabel("Bits:")
         bits.addWidget(self.bits_label)  
         bits.addWidget(self.bits_spin)

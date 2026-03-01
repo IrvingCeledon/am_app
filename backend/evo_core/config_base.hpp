@@ -23,4 +23,7 @@ struct EvoConfigBase
 
     bool use_stagnation{false};
     size_t stagnation_patience{20};
+    
+    // Nivel de logging exigido por Python
+    LogLevel verbosity{LogLevel::INFO_LVL};
 };

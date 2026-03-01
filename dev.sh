@@ -8,10 +8,13 @@ PYTHON=python3
 BUILD_DIR=build
 VENV_DIR=venv
 DATA_DIR=data
+VALGRIND="valgrind"
 
 VENV_PY="$VENV_DIR/bin/python"
 VENV_PIP="$VENV_DIR/bin/pip"
 DEPS_FLAG="$VENV_DIR/.deps_installed"
+VG_FLAGS="--leak-check=full --show-leak-kinds=all --track-origins=yes --log-file=valgrind.log --verbose"
+ASAN_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g -O1"
 
 #######################################
 # Helpers
@@ -51,9 +54,41 @@ build_backend() {
 }
 
 #######################################
+build_asan() {
+    echo "Compiling backend with AddressSanitizer..."
+
+    cmake -S backend -B "$BUILD_DIR" \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_CXX_FLAGS="$ASAN_FLAGS" \
+        -DCMAKE_C_FLAGS="$ASAN_FLAGS" \
+        -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-fsanitize=address"
+
+    cmake --build "$BUILD_DIR" -j"$(nproc)"
+}
+
+#######################################
 run_app() {
     ensure_venv
     echo "Running frontend..."
+    py -m frontend.main "$@"
+}
+
+#######################################
+run_valgrind() {
+    ensure_venv
+    echo "Running with Valgrind (memory check)..."
+    $VALGRIND $VG_FLAGS "$VENV_PY" -m frontend.main "$@"
+}
+
+run_asan() {
+    ensure_venv
+
+    echo "Running with AddressSanitizer..."
+
+    # más info útil en consola
+    export ASAN_OPTIONS=detect_leaks=1:abort_on_error=1:symbolize=1
+
     py -m frontend.main "$@"
 }
 
@@ -73,7 +108,7 @@ clean_cache() {
 
 #######################################
 purge() {
-    echo "Removing build, cache, data and venv..."
+    echo "Removing build, data and venv..."
     rm -rf "$BUILD_DIR" "$DATA_DIR" "$VENV_DIR"
 }
 
@@ -86,6 +121,8 @@ Commands:
   build        -> compile backend
   run          -> run app
   run-debug    -> run app with debug
+  memcheck     -> run app with valgrind memory leak detection
+  asan         -> build + run with AddressSanitizer (fast memory checks)
   deps         -> install dependencies
   all          -> deps + build + run
   clean        -> remove build + cache
@@ -100,6 +137,12 @@ case "${1:-all}" in
     build) build_backend ;;
     run)   run_app ;;
     run-debug)	run_app --debug ;;
+    memcheck) run_valgrind ;;
+    asan)
+        install_deps
+        build_asan
+        run_asan
+    ;;
     deps)  install_deps ;;
     all)
         install_deps
@@ -110,6 +153,10 @@ case "${1:-all}" in
         clean_build
         clean_cache
         ;;
-    purge) purge ;;
+    purge) 
+        clean_build
+        clean_cache
+        purge 
+        ;;
     *) usage ;;
 esac

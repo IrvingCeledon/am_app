@@ -28,7 +28,9 @@ PYBIND11_MODULE(ga_module, m) {
         .def_readwrite("use_target", &GAConfig::use_target)
         .def_readwrite("target_fitness", &GAConfig::target_fitness)
         .def_readwrite("use_stagnation", &GAConfig::use_stagnation)
-        .def_readwrite("stagnation_patience", &GAConfig::stagnation_patience);
+        .def_readwrite("stagnation_patience", &GAConfig::stagnation_patience)
+        
+        .def_readwrite("verbosity", &GAConfig::verbosity);
 
     // 3. Expose the Engine
     py::class_<GAEngine>(m, "GAEngine")

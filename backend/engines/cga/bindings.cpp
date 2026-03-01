@@ -27,7 +27,9 @@ PYBIND11_MODULE(cga_module, m) {
         .def_readwrite("use_target", &CGAConfig::use_target)
         .def_readwrite("target_fitness", &CGAConfig::target_fitness)
         .def_readwrite("use_stagnation", &CGAConfig::use_stagnation)
-        .def_readwrite("stagnation_patience", &CGAConfig::stagnation_patience);
+        .def_readwrite("stagnation_patience", &CGAConfig::stagnation_patience)
+        
+        .def_readwrite("verbosity", &CGAConfig::verbosity);
 
     // 3. The Engine
     py::class_<CGAEngine>(m, "CGAEngine")
