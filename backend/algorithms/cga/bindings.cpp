@@ -10,6 +10,22 @@ namespace py = pybind11;
 PYBIND11_MODULE(cga_module, m) {
     m.doc() = "Continuos Genetic Algorithm module";
 
+    // ===== Types =====
+    py::class_<Range>(m, "Range")
+        .def(py::init<double, double>())
+        .def_readwrite("min", &Range::min)
+        .def_readwrite("max", &Range::max);
+        
+    py::class_<Domains>(m, "Domains")
+        .def(py::init<>())
+        .def_readwrite("ranges", &Domains::ranges);
+        
+    py::class_<RunResult>(m, "RunResult")
+        .def_readwrite("bestFitnesses", &RunResult::bestFitnesses)
+        .def_readwrite("initialPopulation", &RunResult::initialPopulation)
+        .def_readwrite("midPopulation", &RunResult::midPopulation)
+        .def_readwrite("finalPopulation", &RunResult::finalPopulation);
+
     // ===== CGA Configuration =====
     py::class_<CGAConfig>(m, "CGAConfig")
         .def(py::init<>())
@@ -29,4 +45,4 @@ PYBIND11_MODULE(cga_module, m) {
         
     m.def("ackley", &ackley_function);
     m.def("sphere", &sphere_function);
-}
+} 

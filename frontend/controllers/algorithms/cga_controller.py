@@ -8,6 +8,22 @@ class CGAController:
         self.config = cga_module.CGAConfig()
         self.cga = cga_module.CGA(self.config)
         
+    def _build_ranges(self, p: dict):
+        x_i = p["x_i"]
+
+        ranges = []
+
+        if x_i == 2:
+            # Classic 2D case → X && Y
+            ranges.append(cga_module.Range(p["x_min"], p["x_max"]))
+            ranges.append(cga_module.Range(p["y_min"], p["y_max"]))
+        else:
+            # N dimensions → repeat X domain
+            for _ in range(x_i):
+                ranges.append(cga_module.Range(p["x_min"], p["x_max"]))
+
+        return ranges
+        
     def _update_config(self, p: dict):
         fitness_map = {
             "ackley": cga_module.ackley,
@@ -17,11 +33,7 @@ class CGAController:
         self.config.generations = p["generations"]
         self.config.populationSize = p["population"]
 
-        self.config.domains.ranges = []
-        for key, r in p["domains"].items():
-            self.config.domains.ranges.append(
-                cga_module.Range(min=r["min"], max=r["max"])
-            )
+        self.config.domains.ranges = self._build_ranges(p)
 
         self.config.fitness = fitness_map[p["fitness"]]
 
@@ -30,12 +42,11 @@ class CGAController:
         self.config.rates.mutation = p["mutation"]
         
         self.config.mutation_scale = p["mutation_scale"]
-        self.config.stopping_criteria = p["stopping_criteria"]
+        # self.config.stopping_criteria = p["stopping"]
         
     def run_with_params(self, params: dict):
         logger.debug("Updating CGA config")
         self._update_config(params)
 
         self.cga = cga_module.CGA(self.config)
-        
         return self.cga.run()

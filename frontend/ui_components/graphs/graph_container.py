@@ -39,7 +39,7 @@ class GraphContainer(FigureCanvas):
     def plot_population(self, population, color="blue", title="Population"):
         self.ax.clear()
         xs, ys = zip(*population)
-        sc = self.ax.scatter(xs, ys, c=color, alpha=0.4, s=20)
+        sc = self.ax.scatter(xs, ys, c=color, alpha=0.4, s=50)
         self._attach_cursor(sc)
         self._setup_axes("X", "Y", title)
         self.draw()

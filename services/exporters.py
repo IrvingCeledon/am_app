@@ -17,5 +17,6 @@ def export_run_txt(result, filename="data/run_debug.txt"):
         # snapshots
         for label, pop in result.snapshots.items():
             f.write(f"\n{label} population:\n")
-            for x, y in pop:
-                f.write(f"{x}\t{y}\n")
+            for individual in pop:
+                line = "\t".join(map(str, individual))
+                f.write(line + "\n")

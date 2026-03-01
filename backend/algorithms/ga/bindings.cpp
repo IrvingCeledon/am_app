@@ -13,25 +13,10 @@ namespace py = pybind11;
 PYBIND11_MODULE(ga_module, m) {
     m.doc() = "Genetic Algorithm module";
 
-    // ===== Types =====
-    py::class_<Range>(m, "Range")
-        .def_readwrite("min", &Range::min)
-        .def_readwrite("max", &Range::max);
-
-    py::class_<Domains>(m, "Domains")
-        .def_readwrite("x", &Domains::x)
-        .def_readwrite("y", &Domains::y);
-
     py::class_<Rates>(m, "Rates")
         .def_readwrite("selection", &Rates::selection)
         .def_readwrite("crossover", &Rates::crossover)
         .def_readwrite("mutation", &Rates::mutation);
-        
-    py::class_<RunResult>(m, "RunResult")
-        .def_readwrite("bestFitnesses", &RunResult::bestFitnesses)
-        .def_readwrite("initialPopulation", &RunResult::initialPopulation)
-        .def_readwrite("midPopulation", &RunResult::midPopulation)
-        .def_readwrite("finalPopulation", &RunResult::finalPopulation);
 
     py::class_<GAConfig>(m, "GAConfig")
         .def(py::init<>())

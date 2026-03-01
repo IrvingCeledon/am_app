@@ -31,7 +31,11 @@ class RunPage(QWidget):
         main_layout = QVBoxLayout(self)
         upper_controls = QHBoxLayout()
         
+        self.controls_container = QHBoxLayout()
+        self.controls_container.setStretch(0, 6)
+        
         self.controls = GAControls()
+        self.controls_container.addLayout(self.controls.build_layout())
 
         self.graph = GraphContainer()
         self.graph.setSizePolicy(
@@ -40,7 +44,7 @@ class RunPage(QWidget):
         )
 
         upper_controls.addLayout( self._build_main_section(), 2 )
-        upper_controls.addLayout( self.controls.build_layout(), 6 )
+        upper_controls.addLayout( self.controls_container, 6 )
 
         main_layout.addLayout(upper_controls)
         main_layout.addWidget(self.graph)
@@ -92,6 +96,10 @@ class RunPage(QWidget):
         self.graphs_combo.currentTextChanged.connect(
             self._update_graph_by_selection
         )
+        
+        self.algorithm_combo.currentTextChanged.connect(
+            self._on_algorithm_changed
+        )
 
     def show_result(self, result):
         self._last_result = result
@@ -123,3 +131,30 @@ class RunPage(QWidget):
 
         elif text == "final":
             self.graph.plot_population(snaps["final"], "green", "Final")
+            
+    def _on_algorithm_changed(self, algorithm: str):
+        self._clear_controls()
+
+        if algorithm == "GA":
+            self.controls = GAControls()
+        elif algorithm == "CGA":
+            self.controls = CGAControls()
+        else:
+            return
+
+        self.controls_container.addLayout( self.controls.build_layout() )
+        
+    def _clear_controls(self):
+        while self.controls_container.count():
+            item = self.controls_container.takeAt(0)
+
+            if item.layout():
+                self._delete_layout(item.layout())
+
+    def _delete_layout(self, layout):
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+            elif child.layout():
+                self._delete_layout(child.layout())

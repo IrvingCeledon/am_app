@@ -124,7 +124,6 @@ double sphere_function(const std::vector<double>& genes)
     return sum;
 }
 
-
 void CGA::save_pop(std::vector<std::vector<double>>& pop_history)
 {
     for (const auto& ind : pop) {
