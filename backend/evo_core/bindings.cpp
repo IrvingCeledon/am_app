@@ -7,7 +7,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(core_module, m) {
     m.doc() = "Core Evolutionary Types";
 
-    // 1. Exponer el Enum
+    // 1. Expose enum for "log"
     py::enum_<LogLevel>(m, "LogLevel")
         .value("DEBUG", LogLevel::DEBUG_LVL)
         .value("INFO", LogLevel::INFO_LVL)
@@ -19,7 +19,7 @@ PYBIND11_MODULE(core_module, m) {
         .def_readonly("level", &LogEntry::level)
         .def_readonly("message", &LogEntry::message);
 
-    // 1. Expose Core Mathematical Types
+    // 2. Expose Core Mathematical Types
     py::class_<Range>(m, "Range")
         .def(py::init<>())
         .def(py::init<double, double>())

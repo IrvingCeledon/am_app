@@ -28,11 +28,11 @@ def setup_logging(debug: bool) -> None:
     root.addHandler(stream_handler)
     root.addHandler(file_handler)
 
-    # CAMBIO AQUÍ: Activamos explícitamente NUESTROS paquetes
+    # Explicit package activation
     my_level = logging.DEBUG if debug else logging.INFO
     logging.getLogger("frontend").setLevel(my_level)
     logging.getLogger("services").setLevel(my_level)
-    logging.getLogger("__main__").setLevel(my_level) # Para que se vean los logs de la función main()
+    logging.getLogger("__main__").setLevel(my_level) # main() logs
 
 
 def main():

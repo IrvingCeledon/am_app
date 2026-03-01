@@ -5,7 +5,7 @@
 // ==========================================
 
 uint32_t GAEngine::randGene() {
-    // Usamos 1ull para que el shift se haga en 64 bits de forma segura
+    // Random generation based on 1ull (~64 bits) shift to prevent overflow or UB.
     std::uniform_int_distribution<uint32_t> dist(
       0, static_cast<uint32_t>((1ull << this->configuration.bits) - 1)
     );
@@ -60,7 +60,6 @@ void GAEngine::evaluate() {
 }
 
 void GAEngine::selection() {
-    // Sorts from best to worst (lowest cost first) 
     std::sort(this->pop.begin(), this->pop.end()); 
     
     // We truncate the population (e.g., we keep the top 50%) aka elitism
@@ -77,6 +76,7 @@ void GAEngine::crossover()
     std::uniform_int_distribution<size_t> parent_dist(0, this->pop.size() - 1);
     std::uniform_int_distribution<int> point_dist(1, this->configuration.bits - 1);
     
+    // Single-point crossover
     while (this->pop.size() < target) 
     {
         const auto& p1 = this->pop[parent_dist(rng)];

@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import logging
-logger = logging.getLogger(__name__)
 
 from frontend.paths import STYLES_DIR
 from models import AppState
@@ -9,6 +8,10 @@ from frontend.utils import load_stylesheet
 from .settings_controller import SettingsController
 from .run_controller import RunController
 from frontend.pages import MainWindow
+
+
+logger = logging.getLogger(__name__)
+
 
 class AppController:
     def __init__(self, app, root_path: Path):

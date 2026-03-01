@@ -3,6 +3,7 @@ from .main_page import MainPage
 from .run_page import RunPage
 from .settings_page import SettingsPage
 
+
 class MainWindow(QMainWindow):
     MAIN = 0
     SETTINGS = 1
@@ -16,7 +17,7 @@ class MainWindow(QMainWindow):
         self.run_controller = run_controller
         
         # self.resize(700, 500)
-        self.setWindowTitle("Metaheuristic Algorithm Simulator V2.4.2")
+        self.setWindowTitle("Metaheuristic Algorithm Simulator V2.5")
         self.setMinimumSize(700, 500)
         
         self.stack = QStackedWidget()

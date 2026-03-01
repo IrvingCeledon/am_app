@@ -49,7 +49,6 @@ void CGAEngine::evaluate() {
 }
 
 void CGAEngine::selection() {
-    // Sorts from best to worst (lowest cost first) 
     std::sort(this->pop.begin(), this->pop.end()); 
     
     // We truncate the population (e.g., we keep the top 50%) aka elitism
@@ -107,7 +106,7 @@ void CGAEngine::mutate()
             }
         }
         
-        // If the mutation pushed values ​​out of bounds, we corrected them.
+        // If the mutation pushed values ​​out of ranges, we corrected them.
         if (mutated) {
             clamp_individual(this->pop[i]);
         }

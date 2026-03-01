@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton
 from frontend.utils import centered_in_h, set_expandable_width_lim
 
+
 class MainPage(QWidget):
     go_to_settings = Signal()
     go_to_run_page = Signal()

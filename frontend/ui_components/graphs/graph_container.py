@@ -3,6 +3,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import mplcursors
 
+
 class GraphContainer(FigureCanvas):
     def __init__(self):
         super().__init__(Figure())

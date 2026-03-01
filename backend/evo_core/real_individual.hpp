@@ -13,7 +13,7 @@ public:
     explicit RealIndividual(size_t dims) 
         : chromosome(dims, 0.0) {}
 
-    // Pure Getters / Setters puros (Reference returns for in-place modifications)
+    // Pure Getters / Setters (Reference returns for in-place modifications)
     std::vector<double>& genes() noexcept { return chromosome; }
     const std::vector<double>& genes() const noexcept { return chromosome; }
 

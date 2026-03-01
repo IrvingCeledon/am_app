@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QSpinBox, QDoubleSpinBox
-        
+
+   
 def create_spin_box(
         min_val=0, 
         max_val=100, 
@@ -16,7 +17,8 @@ def create_spin_box(
             sb.setValue(value)
             
         return sb
-        
+
+
 def create_double_spin_box(
         min_val=0, 
         max_val=100, 

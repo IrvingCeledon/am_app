@@ -6,7 +6,7 @@ class BinaryIndividual
 {
 private:
     std::vector<uint32_t> chromosome; // Genotype: the bits used for GA to make crossover/mutation
-    std::vector<double> phenotype;    // Fenotype: the values decode to R^n
+    std::vector<double> phenotype;    // Fenotype: the values decoded to R^n
     double cost{};
 
 public:

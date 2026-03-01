@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def load_stylesheet(app, *paths):
     style = ""
     for p in paths:

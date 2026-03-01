@@ -5,6 +5,7 @@ from frontend.utils import create_spin_box, create_double_spin_box
 
 from .controls import Controls
 
+
 class GAControls(Controls):
     def __init__(self):
         super().__init__()

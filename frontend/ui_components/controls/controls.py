@@ -8,31 +8,10 @@ from PySide6.QtWidgets import (
 
 import frontend.utils as ui
 from frontend.utils import create_spin_box, create_double_spin_box
+from frontend.config import BENCHMARKS
 
-class Controls:
-    DEFAULT_PARAMS = {
-        # formato: (x_min, x_max, y_min, y_max, target_fitness_ideal)
-        "f1": (-5.0, 3.0, -5.0, 3.0, -3.999),   # Minimum is -4.0
-        "f2": (-5.0, 3.0, -5.0, 3.0, -5.0),     # Aprox
-        "f3": (-5.0, 5.0, -5.0, 5.0, -19.0),    # Ackley is misspelled here
-        "ackley": (-5.0, 5.0, -5.0, 5.0, -19.0),    # And here
-        "sphere": (-5.12, 5.12, -5.12, 5.12, 0.0001), # Minimum is 0
-        "eggholder": (-512.0, 512.0, -512.0, 512.0, -959.64), # Minimum is on -959.6407
-        "rosenbrock": (-5.0, 10.0, -5.0, 10.0, 0.0001), # Minimum is 0
-        "michalewicz": (0.0, 3.14, 0.0, 3.14, -1.801)   # 2D Minimum is approximately -1.8013
-    }
-        
-    FITNESS_OPTIONS = [
-        ("f(x) = x³ + 4x² - 4x + 1", "f1"),
-        ("f(x) = x⁴ + 5x³ + 4x² - 4x + 1", "f2"),
-        ("Ackley with a = 20, b = 20, c = 2π", "f3"),
-        ("Ackley with a = 20, b = 0.2, c = 2π", "ackley"),
-        ("Sphere", "sphere"),
-        ("Eggholder", "eggholder"),
-        ("Rosenbrock", "rosenbrock"),
-        ("Michalewicz", "michalewicz")
-    ]
-        
+
+class Controls:        
     def __init__(self):
         super().__init__()
         
@@ -102,8 +81,8 @@ class Controls:
         fitness_layout = QHBoxLayout()
         self.fitness_combo = QComboBox()
         
-        for label, internal in self.FITNESS_OPTIONS:
-            self.fitness_combo.addItem(label, userData=internal)
+        for internal_key, data in BENCHMARKS.items():
+            self.fitness_combo.addItem(data["label"], userData=internal_key)
 
         fitness_layout.addWidget(QLabel("Fitness:"))
         fitness_layout.addWidget(self.fitness_combo)
@@ -117,7 +96,6 @@ class Controls:
         
     def _build_miscellaneous_section(self):            
         misc_section = QVBoxLayout()
-        # misc_section.addWidget(QLabel("<b>Stopping Criteria:</b>"))
 
         # Target Fitness
         target_layout = QHBoxLayout()
@@ -128,6 +106,7 @@ class Controls:
         self.target_check.toggled.connect(self.target_spin.setEnabled)
         
         # Signal connection and forced update to synchronize values with fitness function
+        # For lack of a better place, this connection will remain here.
         self.fitness_combo.currentIndexChanged.connect(self._on_fitness_changed)
         self._on_fitness_changed(0)
         
@@ -139,6 +118,7 @@ class Controls:
         self.stag_check = QCheckBox("Stagnation:")
         self.stag_spin = ui.create_spin_box(5, 500, 5, 20, False)
         
+        # Signal to enable/disable the spinbox
         self.stag_check.toggled.connect(self.stag_spin.setEnabled)
 
         stag_layout.addWidget(self.stag_check)
@@ -154,12 +134,12 @@ class Controls:
         fitness_id = self.fitness_combo.itemData(index)
         self.x_i_spin.setValue(2)
         
-        if fitness_id in self.DEFAULT_PARAMS:
-            x_min, x_max, y_min, y_max, target = self.DEFAULT_PARAMS[fitness_id]
+        if fitness_id in BENCHMARKS:
+            data = BENCHMARKS[fitness_id]
             
-            self.x_min.setValue(x_min)
-            self.x_max.setValue(x_max)
-            self.y_min.setValue(y_min)
-            self.y_max.setValue(y_max)
+            self.x_min.setValue(data["x_min"])
+            self.x_max.setValue(data["x_max"])
+            self.y_min.setValue(data["y_min"])
+            self.y_max.setValue(data["y_max"])
             
-            self.target_spin.setValue(target)
+            self.target_spin.setValue(data["target"])

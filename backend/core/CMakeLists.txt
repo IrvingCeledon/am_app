@@ -1,5 +1,4 @@
 add_library(core STATIC
-    logger.cpp
     random.cpp
 )
 

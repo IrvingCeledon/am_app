@@ -1,6 +1,6 @@
 add_library(benchmarks STATIC functions.cpp)
 target_include_directories(benchmarks PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-# Needs defined types in evo_core (like Genome or Fitness)
+
 target_link_libraries(benchmarks PRIVATE evo_core)
 
 pybind11_add_module(benchmarks_module bindings.cpp)

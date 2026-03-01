@@ -1,12 +1,15 @@
 from PySide6.QtCore import QObject, Signal
 
 import logging
-logger = logging.getLogger(__name__)
 
 from frontend.paths import DATA_DIR
 from models import RunResult
 from services import export_run_txt
 from frontend.controllers.algorithms import GAController, CGAController
+
+
+logger = logging.getLogger(__name__)
+
 
 class RunController(QObject):
     resultReady = Signal(object) 
@@ -30,7 +33,7 @@ class RunController(QObject):
         result = self.algorithms[algorithm_name].run_with_params(params)
         
         for entry in result.logs:
-            # Casteamos el Enum de C++ a int (10, 20, 30, 40)
+            # Cast of C++ enum based on Python emulation, int (10, 20, 30, 40)
             log_level_int = int(entry.level) 
             logger.log(log_level_int, f"[C++ {algorithm_name}] {entry.message}")
             

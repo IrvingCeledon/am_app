@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <functional>
-#include <string> // Asegúrate de incluir string
+#include <string>
 
 // ==========================================
 // Logging Types (Matching Python logging levels)
@@ -63,5 +63,7 @@ struct RunResult {
     std::vector<Genome> initialPopulation;
     std::vector<Genome> midPopulation;
     std::vector<Genome> finalPopulation;
+    
+    // Message box for logs required by the frontend
     std::vector<LogEntry> logs;
 };

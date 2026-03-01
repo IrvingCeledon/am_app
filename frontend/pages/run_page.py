@@ -33,6 +33,13 @@ class RunPage(QWidget):
         super().__init__()
 
         self._last_result = None    # Just for draw
+        
+        self.algorithms_registry = {
+            "GA": GAControls(),
+            "CGA": CGAControls()
+        }
+        
+        self.controls_widgets = {}
 
         self._build_ui()
         self._connect_signals()
@@ -41,32 +48,17 @@ class RunPage(QWidget):
         main_layout = QVBoxLayout(self)
         upper_controls = QHBoxLayout()
 
-        # 1. Creamos el Stack (El mazo de cartas)
         self.controls_stack = QStackedWidget()
         self.controls_stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        # 2. Creamos y guardamos las instancias de los controles una sola vez
-        self.ga_controls = GAControls()
-        self.cga_controls = CGAControls()
-
-        # 2. GA Widget - Alineado arriba
-        self.ga_widget = QWidget()
-        ga_layout = self.ga_controls.build_layout()
-        ga_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.ga_widget.setLayout(ga_layout)
-
-        # 3. CGA Widget - Alineado arriba
-        self.cga_widget = QWidget()
-        cga_layout = self.cga_controls.build_layout()
-        cga_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.cga_widget.setLayout(cga_layout)
-
-        # 4. Añadimos las "cartas" al mazo
-        self.controls_stack.addWidget(self.ga_widget)
-        self.controls_stack.addWidget(self.cga_widget)
-
-        # 5. Definimos el control activo actual por defecto
-        self.controls = self.ga_controls
+        for name, controls.instance in self.algorithms_registry.items():
+            widget = QWidget()
+            layout = controls_instance.build_layout()
+            layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+            widget.setLayout(layout)
+            
+            self.controls_stack.addWidget(widget)
+            self.control_widget[name] = widget
 
         self.graph = GraphContainer()
         self.graph.setSizePolicy(
@@ -87,7 +79,7 @@ class RunPage(QWidget):
         # Algorithms:
         algorithms = QHBoxLayout()
         self.algorithm_combo = QComboBox()
-        self.algorithm_combo.addItems(["GA", "CGA"])
+        self.algorithm_combo.addItems(self.algorithms_registry.keys())
 
         algorithms.addWidget(QLabel("Algorithm:"))
         algorithms.addWidget(self.algorithm_combo)
@@ -135,24 +127,6 @@ class RunPage(QWidget):
             self._on_algorithm_changed
         )
 
-    def show_result(self, result):
-        self._last_result = result
-
-        has_mid_population = len(result.snapshots["mid"]) > 0
-        mid_index = self.graphs_combo.findData("mid")
-
-        if mid_index != -1:
-            item = self.graphs_combo.model().item(mid_index)
-            item.setEnabled(has_mid_population)
-
-            if has_mid_population:
-                self.graphs_combo.setItemText(mid_index, "mid")
-            else:
-                self.graphs_combo.setItemText(mid_index, "mid (early stop)")
-
-        self.graphs_combo.setCurrentIndex(0)
-        self.graph.plot_fitness(result.metrics["bestFitnesses"])
-
     def _update_graph_by_selection(self, index):
         if not self._last_result or index == -1:
             self.graphs_combo.setCurrentIndex(0)
@@ -182,9 +156,24 @@ class RunPage(QWidget):
             self.graph.plot_population(snaps["final"], "green", "Final")
 
     def _on_algorithm_changed(self, algorithm: str):
-        if algorithm == "GA":
-            self.controls_stack.setCurrentWidget(self.ga_widget)
-            self.controls = self.ga_controls
-        elif algorithm == "CGA":
-            self.controls_stack.setCurrentWidget(self.cga_widget)
-            self.controls = self.cga_controls
+        if algorithm in self.algorithm_registry: 
+            self.controls_stack.setCurrentWidget(self.control_widgets[algorithm])
+            self.controls = self.algorithms_registry[algorithm]
+            
+    def show_result(self, result):
+        self._last_result = result
+
+        has_mid_population = len(result.snapshots["mid"]) > 0
+        mid_index = self.graphs_combo.findData("mid")
+
+        if mid_index != -1:
+            item = self.graphs_combo.model().item(mid_index)
+            item.setEnabled(has_mid_population)
+
+            if has_mid_population:
+                self.graphs_combo.setItemText(mid_index, "mid")
+            else:
+                self.graphs_combo.setItemText(mid_index, "mid (early stop)")
+
+        self.graphs_combo.setCurrentIndex(0)
+        self.graph.plot_fitness(result.metrics["bestFitnesses"])
