@@ -1,6 +1,9 @@
 #pragma once
 #include <random>
-#include "population.hpp"
+#include <vector>
+
+#include "individual.hpp"
+#include "../evo_core/population.hpp"
 #include "ga_config.hpp"
 
 class GA
@@ -8,7 +11,8 @@ class GA
   private:
     std::mt19937 rng{ std::random_device{}() }; // Initialization of random motor.
     GAConfig configuration;
-    Population pop;
+    
+    Population<Individual> pop;
     
     uint16_t randGene();
     
@@ -29,7 +33,7 @@ class GA
       {}
     
     // Read-only getter:
-    const Population& population() const noexcept { return pop; }
+    const Population<Individual>& population() const noexcept { return pop; }
     
     // Helpers:
     const Individual& best() const noexcept { return pop.best(); }
@@ -42,11 +46,11 @@ class GA
     auto end() const noexcept { return pop.end(); }
     
     // update_config(config) -> on hold
+    void save_pop( std::vector<Genome>>& history );
     RunResult run();
-    void update_config(const GAConfig& config) { configuration = config; }
 };
 
 // Global declaration of cost functions
-double cost_function_a(double, double);
-double cost_function_b(double, double);
-double cost_function_c(double, double);
+double cost_function_a(const Genome&);
+double cost_function_b(const Genome&);
+double cost_function_c(const Genome&);

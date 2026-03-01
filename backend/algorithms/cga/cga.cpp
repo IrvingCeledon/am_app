@@ -1,33 +1,14 @@
 #include <cmath>        // For std::sqrt, std::cos, std::exp
 #include <numbers>      // For std::numbers::pi and std::numbers::e (C++20)
 #include "cga.hpp"
-
-// The range of randGene depends on the bits of ga's instance.
-double CGA::randGene(double min, double max) {
-    std::uniform_real_distribution<double> dist(min, max);
-    
-    return dist(rng);
-}
     
 void CGA::initialize() 
 {
-  const auto& ranges = configuration.domains.ranges;
-  
-  for ( auto& individual : pop )
-  {
-    std::vector<Gene> genes;  // Genes for a new individual.
-    genes.reserve( ranges.size() ); // Reserve the space based on the 'quantity' of ranges.
-    
-    // Each range can have different domains.
-    for ( const auto& r : ranges ) {
-      double value = randGene(r.min, r.max);  // Random value generation.
-      genes.emplace_back(value, r.min, r.max);  // Contruct of object 'in-place'.
+    for (auto& individual : pop)
+    {
+        individual.randomize(configuration.domains, rng);
+        individual.evaluate(configuration.fitness);
     }
-    
-    // Set the generated genes.
-    individual.setChromosome(genes);
-    individual.evaluate(configuration.fitness);
-  }
 }
 
 void CGA::evaluate()
@@ -53,37 +34,16 @@ void CGA::crossover()
     const size_t target = configuration.populationSize;
     const size_t n_keep   = pop.size();
     
-    std::uniform_real_distribution<double> prob(0.0, 1.0);
     std::uniform_int_distribution<size_t> parent_dist(0, n_keep - 1);
     
     // This is arithmetic crossover.
-    while ( pop.size() < target )
+    while (pop.size() < target)
     {
-      // Select parents randomly.
-      const auto& p1 = pop[parent_dist(rng)];
-      const auto& p2 = pop[parent_dist(rng)];
-      
-      Individual child; // New possible child.
-      std::vector<Gene> child_genes;
-      child_genes.reserve(p1.getChromosome().size());
+        const auto& p1 = pop[parent_dist(rng)];
+        const auto& p2 = pop[parent_dist(rng)];
 
-      for (size_t i = 0; i < p1.getChromosome().size(); ++i) 
-      {
-          const auto& g1 = p1.getGene(i);
-          const auto& g2 = p2.getGene(i);
-
-          double value;
-          if (prob(rng) < configuration.rates.crossover) {
-              value = 0.5 * (g1.getValue() + g2.getValue()); // arithmetic mean
-          } else {
-              value = g1.getValue(); // copy parent
-          }
-          
-          child_genes.emplace_back(value, g1.getMin(), g1.getMax());
-      }                    
-        
-      child.setChromosome(child_genes);
-      pop.push_back(child);
+        pop.push_back(
+            p1.crossoverWith(p2, rng, configuration.rates.crossover));
     }
 }
 
@@ -124,16 +84,19 @@ double sphere_function(const std::vector<double>& genes)
     return sum;
 }
 
+
 void CGA::save_pop(std::vector<std::vector<double>>& pop_history)
 {
-    for (const auto& ind : pop) {
+    for (const auto& ind : pop) 
+    {
         std::vector<double> values;
-        
+        values.reserve(ind.getChromosome().size());  
+
         for (const auto& g : ind.getChromosome()) {
             values.push_back(g.getValue());
         }
-        
-        pop_history.push_back(values);
+
+        pop_history.push_back(std::move(values));
     }
 }
 

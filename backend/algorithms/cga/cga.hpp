@@ -1,7 +1,8 @@
 #pragma once
 #include <random>
 #include <vector>
-#include "population.hpp"
+#include "individual.hpp"
+#include "../evo_core/population.hpp"
 #include "cga_config.hpp"
 
 class CGA
@@ -9,9 +10,7 @@ class CGA
   private:
     std::mt19937 rng{ std::random_device{}() }; // Initialization of random motor.
     CGAConfig configuration;
-    Population pop;
-    
-    double randGene(double, double);
+    Population<Individual> pop;
     
     // CGA phases:
     void initialize();
@@ -31,7 +30,7 @@ class CGA
       {}
     
     // Read-only getter:
-    const Population& population() const noexcept { return pop; }
+    const Population<Individual>& population() const noexcept { return pop; }
     
     // Helpers:
     const Individual& best() const noexcept { return pop.best(); }

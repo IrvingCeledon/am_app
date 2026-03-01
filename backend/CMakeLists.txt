@@ -14,4 +14,5 @@ set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 REQUIRED)
 
 add_subdirectory(core)
+add_subdirectory(evo_core)
 add_subdirectory(algorithms)
