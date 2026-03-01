@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, 
+    QStackedWidget,
     QSizePolicy, 
     QVBoxLayout, 
     QHBoxLayout, 
@@ -21,6 +22,14 @@ class RunPage(QWidget):
     
     def __init__(self):
         super().__init__()
+        
+        self.graph_options = [
+            ("none", "none"),
+            ("all", "all"),
+            ("initial", "initial"),
+            ("mid", "mid"),
+            ("final", "final")
+        ]
         
         self._last_result = None    # Just for draw 
         
@@ -64,7 +73,9 @@ class RunPage(QWidget):
         # Graphs:
         graphs = QHBoxLayout()
         self.graphs_combo = QComboBox()
-        self.graphs_combo.addItems(["none", "all", "initial", "mid", "final"])
+        
+        for label, internal in self.graph_options:
+            self.graphs_combo.addItem(label, userData=internal)
         
         graphs.addWidget(QLabel("See"))
         graphs.addWidget(self.graphs_combo)
@@ -93,7 +104,7 @@ class RunPage(QWidget):
 
         self.return_btn.clicked.connect(self.backRequested.emit)
 
-        self.graphs_combo.currentTextChanged.connect(
+        self.graphs_combo.currentIndexChanged.connect(
             self._update_graph_by_selection
         )
         
@@ -103,33 +114,58 @@ class RunPage(QWidget):
 
     def show_result(self, result):
         self._last_result = result
+        
+        # 1. Verificamos si la población de en medio viene vacía
+        has_mid_population = len(result.snapshots["mid"]) > 0
+        
+        # 2. Buscamos el índice de la opción "mid" en tu ComboBox
+        mid_index = self.graphs_combo.findData("mid")
+        
+        if mid_index != -1:
+            # 3. Habilitamos o deshabilitamos el ítem visualmente en el menú desplegable
+            item = self.graphs_combo.model().item(mid_index)
+            item.setEnabled(has_mid_population)
+            
+            # (Opcional) Si quieres ser muy pro, cambias el texto para que el usuario sepa por qué
+            if has_mid_population:
+                self.graphs_combo.setItemText(mid_index, "mid")
+            else:
+                self.graphs_combo.setItemText(mid_index, "mid (early stop)")
+
+        # 4. Reseteamos la vista a la gráfica de convergencia y dibujamos
         self.graphs_combo.setCurrentIndex(0)
         self.graph.plot_fitness(result.metrics["bestFitnesses"])
         
-    def _update_graph_by_selection(self, text):
-        if not self._last_result:
+    # Ahora recibimos el index en lugar del text
+    def _update_graph_by_selection(self, index):
+        if not self._last_result or index == -1:
             self.graphs_combo.setCurrentIndex(0)
             return
 
+        # Extraemos el identificador interno puro ("mid", "none", "all", etc.)
+        internal_data = self.graphs_combo.itemData(index)
         snaps = self._last_result.snapshots
 
-        if text == "none":
+        # Evaluamos usando la data inmutable
+        if internal_data == "none":
             self.graph.plot_fitness(self._last_result.metrics["bestFitnesses"])
 
-        elif text == "all":
-            self.graph.plot_populations_all([
-                (snaps["initial"], "blue", "Initial"),
-                (snaps["mid"], "orange", "Mid"),
-                (snaps["final"], "green", "Final"),
-            ])
+        elif internal_data == "all":
+            # Filtramos 'mid' de 'all' si ocurrió un early stop para que no truene el graficador
+            plots = [(snaps["initial"], "blue", "Initial")]
+            if len(snaps["mid"]) > 0:
+                plots.append((snaps["mid"], "orange", "Mid"))
+            plots.append((snaps["final"], "green", "Final"))
+            
+            self.graph.plot_populations_all(plots)
 
-        elif text == "initial":
+        elif internal_data == "initial":
             self.graph.plot_population(snaps["initial"], "blue", "Initial")
 
-        elif text == "mid":
+        elif internal_data == "mid":
             self.graph.plot_population(snaps["mid"], "orange", "Mid")
 
-        elif text == "final":
+        elif internal_data == "final":
             self.graph.plot_population(snaps["final"], "green", "Final")
             
     def _on_algorithm_changed(self, algorithm: str):

@@ -1,0 +1,4 @@
+add_subdirectory(ga)
+add_subdirectory(cga)
+add_subdirectory(abc)
+add_subdirectory(pso)

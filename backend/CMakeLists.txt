@@ -9,10 +9,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# ========= Python & Pybind11 =========
 find_package(Python 3 REQUIRED COMPONENTS Interpreter Development)
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 REQUIRED)
 
+# ========= Subdirectorys (order matters) =========
 add_subdirectory(core)
 add_subdirectory(evo_core)
-add_subdirectory(algorithms)
+add_subdirectory(benchmarks)
+add_subdirectory(engines)
