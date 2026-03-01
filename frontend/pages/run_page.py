@@ -51,14 +51,17 @@ class RunPage(QWidget):
         self.controls_stack = QStackedWidget()
         self.controls_stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        for name, controls.instance in self.algorithms_registry.items():
+        for name, controls_instance in self.algorithms_registry.items():
             widget = QWidget()
             layout = controls_instance.build_layout()
             layout.setAlignment(Qt.AlignmentFlag.AlignTop)
             widget.setLayout(layout)
             
             self.controls_stack.addWidget(widget)
-            self.control_widget[name] = widget
+            self.controls_widgets[name] = widget
+            
+        aux_control = list(self.algorithms_registry.keys())[0]
+        self.controls = self.algorithms_registry[aux_control]
 
         self.graph = GraphContainer()
         self.graph.setSizePolicy(
@@ -156,8 +159,8 @@ class RunPage(QWidget):
             self.graph.plot_population(snaps["final"], "green", "Final")
 
     def _on_algorithm_changed(self, algorithm: str):
-        if algorithm in self.algorithm_registry: 
-            self.controls_stack.setCurrentWidget(self.control_widgets[algorithm])
+        if algorithm in self.algorithms_registry: 
+            self.controls_stack.setCurrentWidget(self.controls_widgets[algorithm])
             self.controls = self.algorithms_registry[algorithm]
             
     def show_result(self, result):
