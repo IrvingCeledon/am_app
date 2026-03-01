@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 from models import RunResult
 from services import export_run_txt
 from .algorithms import GAController
+from .algorithms import CGAController
 
 class RunController(QObject):
     resultReady = Signal(object) 
@@ -15,7 +16,8 @@ class RunController(QObject):
         
         self.state = state
         self.algorithms = {
-            "GA": GAController()
+            "GA": GAController(),
+            "CGA": CGAController()
         }
 
     def run(self, algorithm_name: str, params: dict):

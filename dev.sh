@@ -59,9 +59,8 @@ run_app() {
 
 #######################################
 clean_build() {
-    echo "Cleaning build and native modules..."
+    echo "Cleaning build..."
     rm -rf "$BUILD_DIR"
-    find frontend/native -type f -name "*.so" -delete
 }
 
 #######################################

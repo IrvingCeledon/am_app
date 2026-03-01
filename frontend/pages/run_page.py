@@ -12,6 +12,7 @@ from PySide6.QtCore import Signal
 
 from frontend.ui_components.graphs.graph_container import GraphContainer
 from frontend.ui_components.controls.ga_controls import GAControls
+from frontend.ui_components.controls.cga_controls import CGAControls
 
 class RunPage(QWidget):
     runRequested = Signal(str, dict)
@@ -50,7 +51,7 @@ class RunPage(QWidget):
         # Algoritthms:
         algorithms = QHBoxLayout()
         self.algorithm_combo = QComboBox()
-        self.algorithm_combo.addItems(["GA"])
+        self.algorithm_combo.addItems(["GA", "CGA"])
         
         algorithms.addWidget(QLabel("Algorithm:"))
         algorithms.addWidget(self.algorithm_combo)

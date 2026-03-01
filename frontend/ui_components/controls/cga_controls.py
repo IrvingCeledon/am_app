@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox
 )
 
-class GAControls:
+class CGAControls:
     def __init__(self):
         super().__init__()
         
@@ -150,7 +150,7 @@ class GAControls:
 
         return parameters_section
             
-    def get_ga_params(self):
+    def get_params(self):
         return {
             "generations": self.generations_spin.value(),
             "population": self.population_spin.value(),
