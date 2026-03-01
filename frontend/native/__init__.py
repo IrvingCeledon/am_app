@@ -11,7 +11,7 @@ __all__ = [
     "benchmarks_module",
     "ga_module",
     "cga_module"
-#    "abc_module",
+    "abc_module",
 #    "pso_module"
 ]
 
