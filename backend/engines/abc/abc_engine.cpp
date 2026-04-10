@@ -24,7 +24,7 @@ void ABCEngine::save_history(std::vector<Genome>& history_target) {
     }
 }
 
-// Genereta a new neighborhood pop, v_{ij} = x_{ij} + \phi (x_{ij} - x_{kj})
+// Genereta a new neighborhood pop, v_{ij} = x_{ij} + \phi (x_{ij} - x_{kj}).
 void ABCEngine::explore_neighborhood(size_t i) 
 {
     auto& ind = this->pop[i];

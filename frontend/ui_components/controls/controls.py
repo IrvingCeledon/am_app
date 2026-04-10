@@ -98,12 +98,7 @@ class Controls:
         domains_section.addLayout(x_layout)
         domains_section.addLayout(y_layout)
         domains_section.addLayout(fitness_layout)
-        domains_section.addLayout(opt_layout) # <--- Añade esto
-
-        # Add sublayouts
-        domains_section.addLayout(x_layout)
-        domains_section.addLayout(y_layout)
-        domains_section.addLayout(fitness_layout)
+        domains_section.addLayout(opt_layout)
 
         return domains_section
         

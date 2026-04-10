@@ -15,7 +15,7 @@ void CGAEngine::clamp_individual(RealIndividual& ind) {
 
 void CGAEngine::save_history(std::vector<Genome>& history_target) {
     for (const auto& ind : this->pop) {
-        // In CGA, the genotype (genes) is identical to the phenotype (genome)
+        // In CGA, the genotype (genes) is identical to the phenotype (genome).
         history_target.push_back(ind.genes());
     }
 }
@@ -53,7 +53,7 @@ void CGAEngine::evaluate() {
 void CGAEngine::selection() {
     std::sort(this->pop.begin(), this->pop.end()); 
     
-    // We truncate the population (e.g., we keep the top 50%) aka elitism
+    // We truncate the population (e.g., we keep the top 50%) aka elitism.
     const size_t keep = static_cast<size_t>(this->pop.size() * this->configuration.selectionRate);
     this->pop.resize(keep);
 }
@@ -73,7 +73,7 @@ void CGAEngine::crossover()
         
         RealIndividual child(dims);
         
-        // Arithmetic cross (parents' mean)
+        // Arithmetic cross (parents' mean).
         for (size_t d = 0; d < dims; ++d) 
         {
             if (prob(rng) < this->configuration.crossoverRate) {
@@ -96,7 +96,7 @@ void CGAEngine::mutate()
 
     const size_t dims = this->configuration.domains.dimension();
 
-    // We start at 1 to apply elitism (not mutating the best individual)
+    // We start at 1 to apply elitism (not mutating the best individual).
     for (size_t i = 1; i < this->pop.size(); ++i) 
     {
         bool mutated = false;

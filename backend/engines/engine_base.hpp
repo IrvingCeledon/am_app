@@ -34,7 +34,7 @@ protected:
         double current_best
     ) 
     {
-        // Ajustamos el target según lo que buscamos
+        // We convert it to negative, taking advantage of the mathematical property that the maximum is the “opposite” of the minimum.
         double internal_target = configuration.minimize ? configuration.target_fitness : -configuration.target_fitness;
         
         if (configuration.use_target && current_best <= internal_target) 
@@ -111,7 +111,7 @@ public:
 
             double current_best = pop.best().getCost();
             
-            // --- CAMBIO AQUÍ: Guardamos el valor real para la gráfica ---
+            // Saves fitness true value.
             double display_best = configuration.minimize ? current_best : -current_best;
             result.bestFitnesses.push_back(display_best);
 
