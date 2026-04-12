@@ -3,6 +3,7 @@ from .ga_controller import GAController
 from .cga_controller import CGAController
 from .abc_controller import ABCController
 from .pso_controller import PSOController
+from .de_controller import DEController
 
 __all__ = [
     "BaseController",
@@ -10,4 +11,5 @@ __all__ = [
     "CGAController",
     "ABCController",
     "PSOController",
+    "DEController"
 ]

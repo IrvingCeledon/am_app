@@ -3,9 +3,9 @@ build/
 *.out
 *.exe
 *.log
+*.so
 CMakeFiles/
 CMakeCache.txt
 Makefile
 data/
-native/
 __pycache__/

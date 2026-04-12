@@ -14,3 +14,5 @@ double eggholder_function(const std::vector<double>&);
 double rosenbrock_function(const std::vector<double>&);
 inline double pow20(double);
 double michalewicz_function(const std::vector<double>&);
+
+double six_hump_camel_function(const std::vector<double>&);

@@ -73,5 +73,14 @@ BENCHMARKS = {
         "y_min": 0.0, "y_max": 3.14,
         "target": -1.801,
         "dims": "N"
+    },
+
+    "six_hump_camel": {
+        "label": "Six-Hump Camel",
+        "func": benchmarks_module.six_hump_camel,
+        "x_min": -3.0, "x_max": 3.0,
+        "y_min": -2.0, "y_max": 2.0,
+        "target": -1.0316,
+        "dims": "2"
     }
 }

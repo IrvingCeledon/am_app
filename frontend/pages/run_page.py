@@ -12,10 +12,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal
 
 from frontend.ui_components.graphs.graph_container import GraphContainer
-from frontend.ui_components.controls.ga_controls import GAControls
-from frontend.ui_components.controls.cga_controls import CGAControls
-from frontend.ui_components.controls.abc_controls import ABCControls
-from frontend.ui_components.controls.pso_controls import PSOControls
+from frontend.ui_components.controls import *
 
 
 class RunPage(QWidget):
@@ -41,6 +38,7 @@ class RunPage(QWidget):
             "CGA": CGAControls(),
             "ABC": ABCControls(),
             "PSO": PSOControls(),
+            "DE": DEControls()
         }
         
         self.controls_widgets = {}

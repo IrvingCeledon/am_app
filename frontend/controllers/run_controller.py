@@ -23,6 +23,7 @@ class RunController(QObject):
             "CGA": CGAController(),
             "ABC": ABCController(),
             "PSO": PSOController(),
+            "DE": DEController()
         }
 
     def run(self, algorithm_name: str, params: dict):

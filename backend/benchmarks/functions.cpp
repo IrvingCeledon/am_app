@@ -118,3 +118,22 @@ double michalewicz_function(const std::vector<double>& genes)
 
     return -sum;
 }
+
+// Six-Hump Camel:
+// f(x1, x2) = (4 - 2.1*x1^2 + x1^4/3)*x1^2 + x1*x2 + (4*x2^2 - 4)*x2^2
+// Range: x1 ∈ [-3, 3], x2 ∈ [-2, 2]
+double six_hump_camel_function(const std::vector<double>& genes)
+{
+    double x = genes.at(0);
+    double y = genes.at(1);
+
+    double x2 = x * x;
+    double x4 = x2 * x2;
+    double y2 = y * y;
+
+    double term1 = (4.0 - 2.1 * x2 + (x4 / 3.0)) * x2;
+    double term2 = x * y;
+    double term3 = (4.0 * y2 - 4.0) * y2;
+
+    return term1 + term2 + term3;
+}

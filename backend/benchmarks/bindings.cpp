@@ -15,4 +15,5 @@ PYBIND11_MODULE(benchmarks_module, m) {
     m.def("eggholder", &eggholder_function, "2D Eggholder Function");
     m.def("rosenbrock", &rosenbrock_function, "2D Rosenbrock Function");
     m.def("michalewicz", &michalewicz_function, "Michalewicz Function");
+    m.def("six_hump_camel", &six_hump_camel_function, "2D Six-Hump Camel Function");
 }
