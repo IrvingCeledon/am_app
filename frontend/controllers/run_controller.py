@@ -5,7 +5,7 @@ import logging
 from frontend.paths import DATA_DIR
 from models import RunResult
 from services import export_run_txt
-from frontend.controllers.algorithms import GAController, CGAController, ABCController
+from frontend.controllers.algorithms import *
 
 
 logger = logging.getLogger(__name__)
@@ -21,7 +21,8 @@ class RunController(QObject):
         self.algorithms = {
             "GA": GAController(),
             "CGA": CGAController(),
-            "ABC": ABCController()
+            "ABC": ABCController(),
+            "PSO": PSOController(),
         }
 
     def run(self, algorithm_name: str, params: dict):

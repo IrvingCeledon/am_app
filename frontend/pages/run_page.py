@@ -15,6 +15,7 @@ from frontend.ui_components.graphs.graph_container import GraphContainer
 from frontend.ui_components.controls.ga_controls import GAControls
 from frontend.ui_components.controls.cga_controls import CGAControls
 from frontend.ui_components.controls.abc_controls import ABCControls
+from frontend.ui_components.controls.pso_controls import PSOControls
 
 
 class RunPage(QWidget):
@@ -38,7 +39,8 @@ class RunPage(QWidget):
         self.algorithms_registry = {
             "GA": GAControls(),
             "CGA": CGAControls(),
-            "ABC": ABCControls()
+            "ABC": ABCControls(),
+            "PSO": PSOControls(),
         }
         
         self.controls_widgets = {}
