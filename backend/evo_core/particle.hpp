@@ -15,7 +15,6 @@ public:
     explicit Particle(size_t dims)
     : position(dims, 0.0), velocity(dims, 0.0), pbest_position(dims, 0.0) {}
 
-    // Alias to match EngineBase and history extraction API
     std::vector<double>& genes() noexcept { return position; }
     const std::vector<double>& genes() const noexcept { return position; }
 
