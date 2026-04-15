@@ -8,7 +8,14 @@ void PSOEngine::clamp_particle(Particle& p) {
     const size_t dims = this->configuration.domains.dimension();
     for (size_t d = 0; d < dims; ++d) {
         const auto& r = this->configuration.domains[d];
-        p.genes()[d] = std::clamp(p.genes()[d], r.min, r.max);
+
+        if (p.genes()[d] > r.max) {
+            p.genes()[d] = r.max;
+            p.getVelocity()[d] = 0.0;
+        } else if (p.genes()[d] < r.min) {
+            p.genes()[d] = r.min;
+            p.getVelocity()[d] = 0.0
+        }
     }
 }
 
