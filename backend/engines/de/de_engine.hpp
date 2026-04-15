@@ -16,6 +16,11 @@ private:
     std::mt19937 rng{ std::random_device{}() };
     void clamp_individual(RealIndividual& ind);
 
+    // Canonical DE Phases
+    Genome mutate(size_t target_idx);
+    Genome recombine(const Genome& target, const Genome& mutant);
+    void select(Population<RealIndividual>& next_gen, size_t target_idx, RealIndividual& trial);
+
 public:
     explicit DEEngine(const DEConfig& config)
     : EngineBase<RealIndividual, DEConfig>(config) {}
