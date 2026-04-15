@@ -14,7 +14,7 @@ void PSOEngine::clamp_particle(Particle& p) {
             p.getVelocity()[d] = 0.0;
         } else if (p.genes()[d] < r.min) {
             p.genes()[d] = r.min;
-            p.getVelocity()[d] = 0.0
+            p.getVelocity()[d] = 0.0; // Added missing semicolon
         }
     }
 }
@@ -66,13 +66,11 @@ void PSOEngine::initialize()
     }
 }
 
-void PSOEngine::update_velocity_and_position()
-{
+void PSOEngine::update_velocity() {
     const size_t dims = this->configuration.domains.dimension();
     std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-    for (auto& p : this->pop)
-    {
+    for (auto& p : this->pop) {
         for (size_t d = 0; d < dims; ++d) {
             double r1 = dist(rng);
             double r2 = dist(rng);
@@ -81,11 +79,24 @@ void PSOEngine::update_velocity_and_position()
             double social = this->configuration.c2 * r2 * (gbest.genes()[d] - p.genes()[d]);
 
             p.getVelocity()[d] = (this->configuration.w * p.getVelocity()[d]) + cognitive + social;
+        }
+    }
+}
 
+void PSOEngine::update_position() {
+    const size_t dims = this->configuration.domains.dimension();
+
+    for (auto& p : this->pop) {
+        for (size_t d = 0; d < dims; ++d) {
             p.genes()[d] += p.getVelocity()[d];
         }
-
+        // Clamp immediately after moving
         clamp_particle(p);
+    }
+}
+
+void PSOEngine::evaluate_and_update_bests() {
+    for (auto& p : this->pop) {
         p.setCost(this->evaluate_fitness(p.genes()));
 
         // Update personal best
@@ -102,7 +113,11 @@ void PSOEngine::update_velocity_and_position()
 }
 
 void PSOEngine::perform_iteration() {
-    update_velocity_and_position();
+    // Canonical execution order
+    update_velocity();
+    update_position();
+    evaluate_and_update_bests();
+
     // EngineBase uses pop.best() to track current generation best.
     // We synchronize the best particle to index 0.
     auto it = std::min_element(this->pop.begin(), this->pop.end());

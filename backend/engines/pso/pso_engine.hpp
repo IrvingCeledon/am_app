@@ -17,7 +17,11 @@ private:
     Particle gbest;
 
     void clamp_particle(Particle& p);
-    void update_velocity_and_position();
+
+    // Canonical PSO Phases
+    void update_velocity();
+    void update_position();
+    void evaluate_and_update_bests();
 
 public:
     explicit PSOEngine(const PSOConfig& config)
