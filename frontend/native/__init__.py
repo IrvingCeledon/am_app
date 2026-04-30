@@ -6,6 +6,7 @@ from . import abc_module
 from . import pso_module
 from . import de_module
 from . import bfoa_module
+from . import kinematic_module
 
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
     "abc_module",
     "pso_module",
     "de_module",
-    "bfoa_module"
+    "bfoa_module",
+    "kinematic_module"
 ]
 
