@@ -5,6 +5,7 @@ from . import cga_module
 from . import abc_module
 from . import pso_module
 from . import de_module
+from . import bfoa_module
 
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "cga_module"
     "abc_module",
     "pso_module",
-    "de_module"
+    "de_module",
+    "bfoa_module"
 ]
 
