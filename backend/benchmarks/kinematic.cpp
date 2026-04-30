@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <numbers>
 
 #include "kinematic.hpp"
@@ -158,7 +160,7 @@ Matrix multiply_matrix(const Matrix& A, const Matrix& B)
  *  - Each matrix encodes both rotation and translation
  *  - The result is always a 4x4 matrix, NOT a scalar
  */
-std::vector<double> get_xyz_position(const std::vector<double>& q_values)
+Matrix get_forward_kinematics(const std::vector<double>& q_values)
 {
     double q1 = q_values.at(0);
     double q2 = q_values.at(1);
@@ -179,32 +181,98 @@ std::vector<double> get_xyz_position(const std::vector<double>& q_values)
     T = multiply_matrix(T, T4);
     T = multiply_matrix(T, T5);
 
-    std::vector<double> pos(3);
-    pos[0] = T[0][3];
-    pos[1] = T[1][3];
-    pos[2] = T[2][3];
+    return T;
+}
 
-    return pos;
+double get_articular(const std::vector<double>& q_olds, const std::vector<double>& q_news)
+{
+    // qn_difference
+    double q1_d = q_news[0] - q_olds[0];
+    double q2_d = q_news[1] - q_olds[1];
+    double q3_d = q_news[2] - q_olds[2];
+    double q4_d = q_news[3] - q_olds[3];
+    double q5_d = q_news[4] - q_olds[4];
+
+    return std::sqrt( q1_d*q1_d
+                    + q2_d*q2_d
+                    + q3_d*q3_d
+                    + q4_d*q4_d
+                    + q5_d*q5_d
+                );
+}
+
+std::vector<double> get_quaternion(const Matrix& K)
+{
+    // Rotation Matrix Trace
+    std::vector<double> actual_quaternion(4);
+    double tr = K[0][0] + K[1][1] + K[2][2];
+    double max_val = std::max({K[0][0], K[1][1], K[2][2]});
+    double s(0.0);
+
+    if (tr > 0) {
+        s = 2.0 * std::sqrt(tr + 1.0);
+        actual_quaternion[0] = 0.25 * s;
+        actual_quaternion[1] = (K[2][1] - K[1][2]) / s;
+        actual_quaternion[2] = (K[0][2] - K[2][0]) / s;
+        actual_quaternion[3] = (K[1][0] - K[0][1]) / s;
+    }
+    else if (tr <= 0 && K[0][0] == max_val) {
+        s = 2.0 * std::sqrt(1 + K[0][0] - K[1][1] - K[2][2]);
+        actual_quaternion[0] = (K[2][1] - K[1][2]) / s;
+        actual_quaternion[1] = 0.25 * s;
+        actual_quaternion[2] = (K[0][1] + K[1][0]) / s;
+        actual_quaternion[3] = (K[0][2] + K[2][0]) / s;
+    }
+    else if (tr <= 0 && K[1][1] == max_val) {
+        s = 2.0 * std::sqrt(1 + K[1][1] - K[0][0] - K[2][2]);
+        actual_quaternion[0] = (K[0][2] - K[2][0]) / s;
+        actual_quaternion[1] = (K[0][1] + K[1][0]) / s;
+        actual_quaternion[2] = 0.25 * s;
+        actual_quaternion[3] = (K[1][2] + K[2][1]) / s;
+    }
+    else if (tr <= 0 && K[2][2] == max_val) {
+        s = 2.0 * std::sqrt(1 + K[2][2] - K[0][0] - K[1][1]);
+        actual_quaternion[0] = (K[1][0] - K[0][1]) / s;
+        actual_quaternion[1] = (K[0][2] + K[2][0]) / s;
+        actual_quaternion[2] = (K[1][2] + K[2][1]) / s;
+        actual_quaternion[3] = 0.25 * s;
+    }
+
+    return actual_quaternion;
+}
+
+double get_e_rot(const std::vector<double>& actual_quaternion, const std::vector<double>& target_quaternion)
+{
+    double qw_dot = actual_quaternion[0] * target_quaternion[0];
+    double qx_dot = actual_quaternion[1] * target_quaternion[1];
+    double qy_dot = actual_quaternion[2] * target_quaternion[2];
+    double qz_dot = actual_quaternion[3] * target_quaternion[3];
+
+    return 1.0 - std::abs(qw_dot + qx_dot + qy_dot + qz_dot);
 }
 
 // Inverse Kinematic
 // fitness:  f(q) = 1 / 1 + e
-// Where e is the euclidian distance between actual position and final position
-double calculate_ik(const std::vector<double>& position, const std::vector<double>& target_xys)
+// Where e is the euclidean distance between actual position and final position
+double IKEvaluator::operator()(const Genome& current_joints) const
 {
-    double p_x = position.at(0);
-    double p_y = position.at(1);
-    double p_z = position.at(2);
+    Matrix K = get_forward_kinematics(current_joints);
 
-    double t_x = target_xys.at(0);
-    double t_y = target_xys.at(1);
-    double t_z = target_xys.at(2);
+    double dx = K[0][3] - target_xyz[0];
+    double dy = K[1][3] - target_xyz[1];
+    double dz = K[2][3] - target_xyz[2];
 
-    double term_1 = (p_x - t_x) * (p_x - t_x);
-    double term_2 = (p_y - t_y) * (p_y - t_y);
-    double term_3 = (p_z - t_z) * (p_z - t_z);
+    double e_espacial = std::sqrt(dx*dx + dy*dy + dz*dz);
 
-    double e = std::sqrt(term_1 + term_2 + term_3);
+    double jmp(0.0);
+    if (!previous_posture.empty()) {
+        jmp = join_motion_penalty * get_articular(previous_posture, current_joints);
+    }
 
-    return 1 / (1 + e);
+    double op(0.0);
+    if (!target_quaternion.empty()) {
+        op = get_e_rot(get_quaternion(K), target_quaternion) * orientation_penalty;
+    }
+
+    return 1.0 / (1.0 + e_espacial + jmp + op);
 }
