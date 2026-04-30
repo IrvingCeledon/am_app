@@ -5,15 +5,13 @@ from .controls import Controls
 class BFOAControls(Controls):
     def __init__(self):
         super().__init__()
-        # Ocultamos/Deshabilitamos el control genérico de 'generations' de BaseControls
-        # ya que BFOA usa ciclos anidados.
-        self.generations_spin.setEnabled(False)
 
     def build_layout(self):
         upper_controls = QHBoxLayout()
         upper_controls.setSpacing(5)
 
         upper_controls.addLayout(self._build_size_section())
+        self.generations_spin.setEnabled(False)
         upper_controls.addLayout(self._build_domains_section())
         upper_controls.addLayout(self._build_bfoa_cycles_section())
         upper_controls.addLayout(self._build_bfoa_params_section())

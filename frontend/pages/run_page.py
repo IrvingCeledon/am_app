@@ -38,7 +38,8 @@ class RunPage(QWidget):
             "CGA": CGAControls(),
             "ABC": ABCControls(),
             "PSO": PSOControls(),
-            "DE": DEControls()
+            "DE": DEControls(),
+            "BFOA": BFOAControls()
         }
         
         self.controls_widgets = {}

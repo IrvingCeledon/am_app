@@ -24,7 +24,7 @@ class RunController(QObject):
             "ABC": ABCController(),
             "PSO": PSOController(),
             "DE": DEController(),
-            "BFOA": BFOAController
+            "BFOA": BFOAController()
         }
 
     def run(self, algorithm_name: str, params: dict):
