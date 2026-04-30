@@ -67,3 +67,8 @@ struct RunResult {
     // Message box for logs required by the frontend
     std::vector<LogEntry> logs;
 };
+
+// ==========================================
+// Alias for inverse kinematic problem
+// ==========================================
+using Matrix = std::array<std::array<double, 4>, 4>;
