@@ -29,6 +29,7 @@ private:
     void clamp_bacterium(Bacterium& b);
     void save_history(std::vector<Genome>& target);
     void push_log(RunResult& res, LogLevel lvl, const std::string& msg);
+    bool check_stopping_criteria(RunResult& result, size_t& patience, double& prev_best, double current_best);
 
 public:
     explicit BFOAEngine(const BFOAConfig& config)

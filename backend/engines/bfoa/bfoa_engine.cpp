@@ -29,6 +29,44 @@ void BFOAEngine::push_log(RunResult& res, LogLevel lvl, const std::string& msg) 
     }
 }
 
+bool BFOAEngine::check_stopping_criteria(RunResult& result, size_t& patience, double& prev_best, double current_best) {
+    double internal_target = configuration.minimize ? configuration.target_fitness : -configuration.target_fitness;
+
+    if (configuration.use_target && current_best <= internal_target) {
+        double display_best = configuration.minimize ? current_best : -current_best;
+        push_log(result, LogLevel::INFO_LVL, "Target fitness reached: " + std::to_string(display_best));
+        return true;
+    }
+
+    if (!configuration.use_stagnation) {
+        prev_best = current_best;
+        return false;
+    }
+
+    if (prev_best == std::numeric_limits<double>::max()) {
+        prev_best = current_best;
+        return false;
+    }
+
+    const bool improved = (prev_best - current_best) >= 1e-6;
+
+    if (improved) {
+        patience = 0;
+        prev_best = current_best;
+        return false;
+    }
+
+    patience++;
+    if (patience >= configuration.stagnation_patience) {
+        push_log(result, LogLevel::WARNING_LVL,
+                 "Early stopping: no improvement for " +
+                 std::to_string(configuration.stagnation_patience) + " steps.");
+        return true;
+    }
+
+    return false;
+}
+
 // ==========================================
 // BFOA Core Phases
 // ==========================================
@@ -177,40 +215,44 @@ RunResult BFOAEngine::run() {
     configuration.chemotactic_steps;
     size_t current_gen = 0;
 
-    for (size_t l = 0; l < configuration.elimination_dispersal_steps; ++l) {
-        for (size_t k = 0; k < configuration.reproduction_steps; ++k) {
+    size_t stagnation_counter = 0;
+    double prev_best = std::numeric_limits<double>::max();
+    bool early_stop = false;
 
-            // Reset health for the new reproduction cycle
+    // The 3 canonical BFOA loops remain visible and clear
+    for (size_t l = 0; l < configuration.elimination_dispersal_steps && !early_stop; ++l) {
+        for (size_t k = 0; k < configuration.reproduction_steps && !early_stop; ++k) {
+
             for(auto& b : this->pop) { b.resetHealth(); }
 
-            for (size_t j = 0; j < configuration.chemotactic_steps; ++j) {
+            for (size_t j = 0; j < configuration.chemotactic_steps && !early_stop; ++j) {
 
                 chemotaxis();
 
-                // Track global best
-                double step_best_fitness = std::numeric_limits<double>::max();
+                // Find global best in current step
                 for (const auto& b : this->pop) {
-                    double true_cost = evaluate_fitness(b.genes()); // Evaluate without swarming penalty for reporting
-                    if (true_cost < step_best_fitness) {
-                        step_best_fitness = true_cost;
-                    }
+                    double true_cost = evaluate_fitness(b.genes());
                     if (true_cost < global_best.getCost()) {
                         global_best = b;
                         global_best.setCost(true_cost);
                     }
                 }
 
-                double display_best = configuration.minimize ? global_best.getCost() : -global_best.getCost();
+                double current_best = global_best.getCost();
+                double display_best = configuration.minimize ? current_best : -current_best;
                 result.bestFitnesses.push_back(display_best);
 
+                // Abstracted stopping logic
+                early_stop = check_stopping_criteria(result, stagnation_counter, prev_best, current_best);
+
                 current_gen++;
-                if (current_gen == total_generations / 2) {
+                if (current_gen == total_generations / 2 && !early_stop) {
                     save_history(result.midPopulation);
                 }
             }
-            reproduction();
+            if (!early_stop) reproduction();
         }
-        reorientation();
+        if (!early_stop) reorientation();
     }
 
     push_log(result, LogLevel::INFO_LVL, "Execution completed. Best fitness: " + std::to_string(configuration.minimize ? global_best.getCost() : -global_best.getCost()));
