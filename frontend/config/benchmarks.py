@@ -1,10 +1,10 @@
 from frontend.native import benchmarks_module
 
-
 BENCHMARKS = {
 
     "f1": {
         "label": "f(x) = x³ + 4x² - 4x + 1",
+        "type": "standard",
         "func": benchmarks_module.cost_function_a,
         "x_min": -5.0, "x_max": 3.0,
         "y_min": -5.0, "y_max": 3.0,
@@ -14,6 +14,7 @@ BENCHMARKS = {
 
     "f2": {
         "label": "f(x) = x⁴ + 5x³ + 4x² - 4x + 1",
+        "type": "standard",
         "func": benchmarks_module.cost_function_b,
         "x_min": -5.0, "x_max": 3.0,
         "y_min": -5.0, "y_max": 3.0,
@@ -23,6 +24,7 @@ BENCHMARKS = {
 
     "f3": {
         "label": "Ackley with a = 20, b = 20, c = 2π",
+        "type": "standard",
         "func": benchmarks_module.cost_function_c,
         "x_min": -5.0, "x_max": 5.0,
         "y_min": -5.0, "y_max": 5.0,
@@ -32,6 +34,7 @@ BENCHMARKS = {
 
     "ackley": {
         "label": "Ackley with a = 20, b = 0.2, c = 2π",
+        "type": "standard",
         "func": benchmarks_module.ackley,
         "x_min": -5.0, "x_max": 5.0,
         "y_min": -5.0, "y_max": 5.0,
@@ -41,6 +44,7 @@ BENCHMARKS = {
 
     "sphere": {
         "label": "Sphere",
+        "type": "standard",
         "func": benchmarks_module.sphere,
         "x_min": -5.12, "x_max": 5.12,
         "y_min": -5.12, "y_max": 5.12,
@@ -50,6 +54,7 @@ BENCHMARKS = {
 
     "eggholder": {
         "label": "Eggholder",
+        "type": "standard",
         "func": benchmarks_module.eggholder,
         "x_min": -512.0, "x_max": 512.0,
         "y_min": -512.0, "y_max": 512.0,
@@ -59,6 +64,7 @@ BENCHMARKS = {
 
     "rosenbrock": {
         "label": "Rosenbrock",
+        "type": "standard",
         "func": benchmarks_module.rosenbrock,
         "x_min": -5.0, "x_max": 10.0,
         "y_min": -5.0, "y_max": 10.0,
@@ -68,6 +74,7 @@ BENCHMARKS = {
 
     "michalewicz": {
         "label": "Michalewicz",
+        "type": "standard",
         "func": benchmarks_module.michalewicz,
         "x_min": 0.0, "x_max": 3.14,
         "y_min": 0.0, "y_max": 3.14,
@@ -77,10 +84,24 @@ BENCHMARKS = {
 
     "six_hump_camel": {
         "label": "Six-Hump Camel",
+        "type": "standard",
         "func": benchmarks_module.six_hump_camel,
         "x_min": -3.0, "x_max": 3.0,
         "y_min": -2.0, "y_max": 2.0,
         "target": -1.0316,
         "dims": "2"
+    },
+
+    "ik_stanford": {
+        "label": "5-DOF IK (Stanford)",
+        "type": "ik", # <--- Define explícitamente el tipo de panel/problema a usar
+        "dims": "5",
+        "target": 0.999,
+        # Default fallback values for the UI configuration
+        "ik_defaults": {
+            "target_xyz": [0.5, 0.5, 0.5],
+            "target_quat": [1.0, 0.0, 0.0, 0.0],
+            "prev_posture": [0.0, 0.0, 0.5, 0.0, 0.0]
+        }
     }
 }

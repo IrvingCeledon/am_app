@@ -74,24 +74,10 @@ class BFOAControls(Controls):
         return params_section
 
     def get_params(self):
-        # Tomamos los parámetros base
-        params = super().get_params() if hasattr(super(), 'get_params') else {
-            "generations": 0, # Ignorado en backend
-            "population": self.population_spin.value(),
-            "x_i": self.x_i_spin.value(),
-            "x_min": self.x_min.value(),
-            "x_max": self.x_max.value(),
-            "y_min": self.y_min.value(),
-            "y_max": self.y_max.value(),
-            "fitness": self.fitness_combo.currentData(),
-            "minimize": self.opt_type_combo.currentData(),
-            "use_target": self.target_check.isChecked(),
-            "target_fitness": self.target_spin.value(),
-            "use_stagnation": self.stag_check.isChecked(),
-            "stagnation_patience": self.stag_spin.value(),
-        }
+        # Get base parameters (size, domains, miscellaneous)
+        params = super().get_params()
 
-        # Agregamos los parámetros específicos de BFOA
+        # Add BFOA specific parameters
         params.update({
             "chemotactic_steps": self.chemo_spin.value(),
             "reproduction_steps": self.repro_spin.value(),
@@ -99,10 +85,11 @@ class BFOAControls(Controls):
             "step_size": self.step_spin.value(),
             "run_length": self.length_spin.value(),
             "elimination_rate": self.elim_rate_spin.value(),
-            # Swarming defaults (podrías añadir spins para esto si quieres editarlos visualmente)
+            # Swarming defaults
             "d_attract": 0.1,
             "w_attract": 0.2,
             "h_repel": 0.1,
             "w_repel": 10.0
         })
+
         return params

@@ -45,21 +45,14 @@ class PSOControls(Controls):
         return params_section
 
     def get_params(self):
-        return {
-            "generations": self.generations_spin.value(),
-            "population": self.population_spin.value(),
-            "x_i": self.x_i_spin.value(),
-            "x_min": self.x_min.value(),
-            "x_max": self.x_max.value(),
-            "y_min": self.y_min.value(),
-            "y_max": self.y_max.value(),
-            "fitness": self.fitness_combo.currentData(),
-            "minimize": self.opt_type_combo.currentData(),
-            "use_target": self.target_check.isChecked(),
-            "target_fitness": self.target_spin.value(),
-            "use_stagnation": self.stag_check.isChecked(),
-            "stagnation_patience": self.stag_spin.value(),
+        # Get base parameters (size, domains, miscellaneous)
+        params = super().get_params()
+
+        # Add PSO specific parameters
+        params.update({
             "w": self.w_spin.value(),
             "c1": self.c1_spin.value(),
             "c2": self.c2_spin.value()
-        }
+        })
+
+        return params

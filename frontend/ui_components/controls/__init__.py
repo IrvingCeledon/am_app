@@ -5,6 +5,7 @@ from .abc_controls import ABCControls
 from .pso_controls import PSOControls
 from .de_controls import DEControls
 from .bfoa_controls import BFOAControls
+from .problem_panels import StandardProblemPanel, IKProblemPanel
 
 __all__ = [
     "Controls",
@@ -13,6 +14,8 @@ __all__ = [
     "ABCControls",
     "PSOControls",
     "DEControls",
-    "BFOAControls"
+    "BFOAControls",
+    "StandardProblemPanel",
+    "IKProblemPanel"
 ]
 
