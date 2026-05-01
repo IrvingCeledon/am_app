@@ -35,7 +35,7 @@ void PSOEngine::initialize()
 
     // Initialize global best with worst possible scenario
     gbest = Particle(dims);
-    gbest.setCost(this->configuration.minimize ? std::numeric_limits<double>::max() : -std::numeric_limits<double>::max());
+    gbest.setCost(std::numeric_limits<double>::max());
 
     for (auto& p : this->pop)
     {

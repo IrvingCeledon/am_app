@@ -13,7 +13,7 @@ __all__ = [
     "core_module",
     "benchmarks_module",
     "ga_module",
-    "cga_module"
+    "cga_module",
     "abc_module",
     "pso_module",
     "de_module",

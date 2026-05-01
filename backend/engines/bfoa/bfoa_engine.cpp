@@ -75,7 +75,7 @@ void BFOAEngine::initialize() {
     const size_t dims = this->configuration.domains.dimension();
 
     global_best = Bacterium(dims);
-    global_best.setCost(this->configuration.minimize ? std::numeric_limits<double>::max() : -std::numeric_limits<double>::max());
+    global_best.setCost(std::numeric_limits<double>::max());
 
     for (auto& b : this->pop) {
         b = Bacterium(dims);

@@ -46,7 +46,9 @@ class GraphContainer(FigureCanvas):
         func_id = params.get("fitness")
         if not func_id or func_id not in BENCHMARKS: return
         
-        func = BENCHMARKS[func_id]["func"]
+        # Use .get() to prevent KeyError if "func" is missing (like in IK)
+        func = BENCHMARKS[func_id].get("func")
+        if not func: return
         x_min, x_max = params["x_min"], params["x_max"]
         
         # Calculamos un margen visual del 5% del tamaño del dominio
@@ -94,11 +96,22 @@ class GraphContainer(FigureCanvas):
             return
 
         dim = len(population[0])
+
+        # Guard clause for N-Dimensional problems (must be BEFORE _draw_background)
+        if dim > 2:
+            self.ax.get_yaxis().set_visible(True)
+            self.ax.text(0.5, 0.5, f"Cannot show dispersion of functions with >2D (Current: {dim}D)",
+                         horizontalalignment='center', verticalalignment='center',
+                         transform=self.ax.transAxes, fontsize=12, color='red')
+            self._setup_axes("", "", title)
+            self.draw()
+            return
+
         self._draw_background(dim, params)
 
         if dim == 1:
             # Usando tu idea: Evaluamos el Fitness para ponerlo en el eje Y
-            func = BENCHMARKS[params["fitness"]]["func"] if params else lambda x: 0
+            func = BENCHMARKS[params["fitness"]].get("func", lambda x: 0) if params else lambda x: 0
             xs = [ind[0] for ind in population]
             ys = [func([x]) for x in xs]
             sc = self.ax.scatter(xs, ys, c=color, edgecolors='black', alpha=0.5, s=60, zorder=2)
@@ -110,13 +123,6 @@ class GraphContainer(FigureCanvas):
             sc = self.ax.scatter(xs, ys, c=color, edgecolors='black', alpha=0.5, s=50, zorder=2)
             self._attach_cursor(sc)
             self._setup_axes("X", "Y", title)
-
-        else:
-            self.ax.get_yaxis().set_visible(True)
-            self.ax.text(0.5, 0.5, f"Cannot show dispersion of functions with >2D (Current: {dim}D)", 
-                         horizontalalignment='center', verticalalignment='center', 
-                         transform=self.ax.transAxes, fontsize=12, color='red')
-            self._setup_axes("", "", title)
 
         self.draw()
 
@@ -144,7 +150,7 @@ class GraphContainer(FigureCanvas):
 
         self._draw_background(dim, params)
         artists = []
-        func = BENCHMARKS[params["fitness"]]["func"] if params else lambda x: 0
+        func = BENCHMARKS[params["fitness"]].get("func", lambda x: 0) if params else lambda x: 0
 
         for pop, color, label in populations:
             if not pop: continue
