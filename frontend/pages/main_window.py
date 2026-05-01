@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
         self.settings = settings_controller
         self.run_controller = run_controller
         
-        self.setWindowTitle("Metaheuristic Algorithm Simulator V6.0")
+        self.setWindowTitle("Metaheuristic Algorithm Simulator V7.0")
         
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)

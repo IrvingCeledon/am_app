@@ -25,7 +25,8 @@ class RunPage(QWidget):
         ("all", "all"),
         ("initial", "initial"),
         ("mid", "mid"),
-        ("final", "final")
+        ("final", "final"),
+        ("3D Robot Pose", "3d")
     ]
 
     def __init__(self):
@@ -163,6 +164,15 @@ class RunPage(QWidget):
 
         elif internal_data == "final":
             self.graph.plot_population(snaps["final"], "green", "Final", params)
+
+        elif internal_data == "3d":
+            if params.get("problem_type") == "ik":
+                # Asumimos que el backend ordena la población; el índice 0 es el mejor
+                best_individual = snaps["final"][0]
+                target = params.get("ik_target_xyz", [0.5, 0.5, 0.5])
+                self.graph.plot_robot_3d(best_individual, target)
+            else:
+                self.graphs_combo.setCurrentIndex(0)
 
     def _on_algorithm_changed(self, algorithm: str):
         if algorithm in self.algorithms_registry: 
