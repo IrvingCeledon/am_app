@@ -122,7 +122,7 @@ class IKProblemPanel(QWidget):
         layout.addLayout(target_layout)
 
         # Extra Feature: Quaternions (Orientation Penalty)
-        self.enable_quat_cb = QCheckBox("Full Pose (30 pts)")
+        self.enable_quat_cb = QCheckBox("Full Pose (position and orientation):")
         self.enable_quat_cb.toggled.connect(self._toggle_quat_inputs)
         layout.addWidget(self.enable_quat_cb)
 
@@ -132,7 +132,7 @@ class IKProblemPanel(QWidget):
         self.ik_qy = ui.create_double_spin_box(-1.0, 1.0, 0.1, 0.0, enable=False)
         self.ik_qz = ui.create_double_spin_box(-1.0, 1.0, 0.1, 0.0, enable=False)
 
-        self.quat_layout.addWidget(QLabel("Quat. (w,x,y,z):"))
+        self.quat_layout.addWidget(QLabel("Quaternions (w,x,y,z):"))
         self.quat_layout.addWidget(self.ik_qw)
         self.quat_layout.addWidget(self.ik_qx)
         self.quat_layout.addWidget(self.ik_qy)
@@ -140,7 +140,7 @@ class IKProblemPanel(QWidget):
         layout.addLayout(self.quat_layout)
 
         # Extra Feature: Joint Continuity (Motion Penalty)
-        self.enable_prev_cb = QCheckBox("Joint Continuity (20 pts)")
+        self.enable_prev_cb = QCheckBox("Joint Continuity:")
         self.enable_prev_cb.toggled.connect(self._toggle_prev_inputs)
         layout.addWidget(self.enable_prev_cb)
 

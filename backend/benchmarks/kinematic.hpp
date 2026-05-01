@@ -7,6 +7,14 @@
 
 using Matrix = std::array<std::array<double, 4>, 4>;
 
+/*
+ * ==================================================
+ * Kinematic & Mathematical Utilities
+ * ==================================================
+ * Helper functions to compute matrix operations,
+ * extract orientations, and evaluate positional errors
+ * required for the Inverse Kinematics objective function.
+ */
 Matrix create_matrix(double, double, double, double);
 Matrix multiply_matrix(const Matrix&, const Matrix&);
 Matrix get_forward_kinematics(const std::vector<double>&);
@@ -16,14 +24,14 @@ std::vector<double> get_quaternion(const Matrix&);
 double get_e_rot(const std::vector<double>&, const std::vector<double>&);
 
 /*
-* ==================================================
-* Inverse Kinematics Fitness Evaluator (Functor)
-* ==================================================
-* This struct encapsulates the specific target state required to
-* evaluate the inverse kinematics problem, while exposing an
-* operator() that matches the generic 'Fitness' signature expected
-* by the evolutionary engines.
-*/
+ * ==================================================
+ * Inverse Kinematics Fitness Evaluator (Functor)
+ * ==================================================
+ * This struct encapsulates the specific target state required to
+ * evaluate the inverse kinematics problem, while exposing an
+ * operator() that matches the generic 'Fitness' signature expected
+ * by the evolutionary engines.
+ */
 struct IKEvaluator
 {
 private:
@@ -37,8 +45,8 @@ public:
     explicit IKEvaluator(const std::vector<double>& target,
                          const std::vector<double>& prev_posture = {},
                          const std::vector<double>& target_q = {},
-                         double jmp = 0.5,
-                         double op = 10)
+                         double jmp = 0.25,
+                         double op = 2)
                         : target_xyz(target)
                         , previous_posture(prev_posture)
                         , target_quaternion(target_q)

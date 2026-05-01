@@ -184,6 +184,18 @@ Matrix get_forward_kinematics(const std::vector<double>& q_values)
     return T;
 }
 
+/*
+ * ========================================
+ * Joint Motion Penalty Calculation
+ * ========================================
+ * Computes the Euclidean distance between two joint configurations
+ * (previous posture and current posture).
+ *
+ * This penalizes large, abrupt movements between consecutive
+ * target points to ensure smooth trajectory planning.
+ *
+ * Δq = √( sum( (q_new[i] - q_old[i])^2 ) )
+ */
 double get_articular(const std::vector<double>& q_olds, const std::vector<double>& q_news)
 {
     // qn_difference
@@ -201,6 +213,17 @@ double get_articular(const std::vector<double>& q_olds, const std::vector<double
                 );
 }
 
+/*
+ * ========================================
+ * Rotation Matrix to Quaternion Conversion
+ * ========================================
+ * Extracts the 3x3 rotation matrix from a 4x4 Homogeneous
+ * Transformation Matrix and converts it into a unit quaternion
+ * [qw, qx, qy, qz].
+ *
+ * The algorithm uses the trace of the rotation matrix to determine
+ * the largest component to avoid numerical instability (division by zero).
+ */
 std::vector<double> get_quaternion(const Matrix& K)
 {
     // Rotation Matrix Trace
@@ -241,6 +264,17 @@ std::vector<double> get_quaternion(const Matrix& K)
     return actual_quaternion;
 }
 
+/*
+ * ========================================
+ * Quaternion Orientation Error
+ * ========================================
+ * Computes the orientation error between the actual end-effector
+ * quaternion and the target quaternion.
+ *
+ * Uses the dot product of the quaternions:
+ * e_rot = 1 - |q_actual · q_target|
+ * A value of 0 means the orientations are perfectly aligned.
+ */
 double get_e_rot(const std::vector<double>& actual_quaternion, const std::vector<double>& target_quaternion)
 {
     double qw_dot = actual_quaternion[0] * target_quaternion[0];
@@ -251,9 +285,23 @@ double get_e_rot(const std::vector<double>& actual_quaternion, const std::vector
     return 1.0 - std::abs(qw_dot + qx_dot + qy_dot + qz_dot);
 }
 
-// Inverse Kinematic
-// fitness:  f(q) = 1 / 1 + e
-// Where e is the euclidean distance between actual position and final position
+/*
+ * ========================================
+ * Inverse Kinematics Objective Function
+ * ========================================
+ * Evaluates how well a given set of joint configurations (Genome)
+ * achieves the desired target position and orientation.
+ *
+ * Error components:
+ * 1. e_espacial: Euclidean distance between current and target XYZ.
+ * 2. jmp (Joint Motion Penalty): Penalizes abrupt joint changes if a
+ *    previous posture is provided.
+ * 3. op (Orientation Penalty): Penalizes misalignment with the target
+ *    quaternion if an orientation is provided.
+ *
+ * Fitness mapping: f(q) = 1 / (1 + Total Error)
+ * The problem is framed as a MAXIMIZATION task.
+ */
 double IKEvaluator::operator()(const Genome& current_joints) const
 {
     Matrix K = get_forward_kinematics(current_joints);
