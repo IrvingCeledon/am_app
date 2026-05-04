@@ -162,11 +162,11 @@ Matrix multiply_matrix(const Matrix& A, const Matrix& B)
  */
 Matrix get_forward_kinematics(const std::vector<double>& q_values)
 {
-    double q1 = q_values.at(0);
-    double q2 = q_values.at(1);
-    double q3 = q_values.at(2);
-    double q4 = q_values.at(3);
-    double q5 = q_values.at(4);
+    double q1 = q_values[0];
+    double q2 = q_values[1];
+    double q3 = q_values[2];
+    double q4 = q_values[3];
+    double q5 = q_values[4];
 
     const double half_pi = std::numbers::pi/2;
 

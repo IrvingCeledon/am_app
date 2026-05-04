@@ -68,18 +68,20 @@ class BaseController:
         # Extract parameters from the IK UI Panel
         t_xyz = p.get("ik_target_xyz", [0.5, 0.5, 0.5])
 
-        # Extract optional penalties
+        # Extract optional targets and dynamic penalty weights
         t_quat = p.get("ik_target_quat", []) if p.get("ik_use_quat", False) else []
-        p_posture = p.get("ik_prev_posture", []) if p.get("ik_use_prev", False) else []
+        op_weight = p.get("ik_op_weight", 2.0)
 
-        # Instantiate the C++ Functor evaluator
-        # Using default penalty weights: 0.5 for joint motion, 10.0 for orientation
+        p_posture = p.get("ik_prev_posture", []) if p.get("ik_use_prev", False) else []
+        jmp_weight = p.get("ik_jmp_weight", 0.25)
+
+        # Instantiate the C++ Functor evaluator with user-defined penalties
         ik_eval = kinematic_module.IKEvaluator(
             t_xyz,
             p_posture,
             t_quat,
-            0.5,
-            10.0
+            jmp_weight,
+            op_weight
         )
 
         config_obj.fitness = ik_eval

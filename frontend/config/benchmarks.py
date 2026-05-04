@@ -101,7 +101,9 @@ BENCHMARKS = {
         "ik_defaults": {
             "target_xyz": [0.5, 0.5, 0.5],
             "target_quat": [1.0, 0.0, 0.0, 0.0],
-            "prev_posture": [0.0, 0.0, 0.5, 0.0, 0.0]
+            "prev_posture": [0.0, 0.0, 0.5, 0.0, 0.0],
+            "orientation_weight": 2,
+            "joint_motion_weight": .25
         }
     }
 }

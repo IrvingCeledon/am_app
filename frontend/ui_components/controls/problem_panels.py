@@ -132,11 +132,15 @@ class IKProblemPanel(QWidget):
         self.ik_qy = ui.create_double_spin_box(-1.0, 1.0, 0.1, 0.0, enable=False)
         self.ik_qz = ui.create_double_spin_box(-1.0, 1.0, 0.1, 0.0, enable=False)
 
-        self.quat_layout.addWidget(QLabel("Quaternions (w,x,y,z):"))
+        self.ik_op = ui.create_double_spin_box(0.0, 100.0, 0.5, 2.0, decimals=2, enable=False)
+
+        self.quat_layout.addWidget(QLabel("Quat (w,x,y,z):"))
         self.quat_layout.addWidget(self.ik_qw)
         self.quat_layout.addWidget(self.ik_qx)
         self.quat_layout.addWidget(self.ik_qy)
         self.quat_layout.addWidget(self.ik_qz)
+        self.quat_layout.addWidget(QLabel("Orientation penalty:"))
+        self.quat_layout.addWidget(self.ik_op)
         layout.addLayout(self.quat_layout)
 
         # Extra Feature: Joint Continuity (Motion Penalty)
@@ -151,12 +155,16 @@ class IKProblemPanel(QWidget):
         self.ik_pq4 = ui.create_double_spin_box(-3.15, 3.15, 0.1, 0.0, enable=False)
         self.ik_pq5 = ui.create_double_spin_box(-3.15, 3.15, 0.1, 0.0, enable=False)
 
+        self.ik_jmp = ui.create_double_spin_box(0.0, 100.0, 0.05, 0.25, decimals=2, enable=False)
+
         self.prev_layout.addWidget(QLabel("Prev Posture:"))
         self.prev_layout.addWidget(self.ik_pq1)
         self.prev_layout.addWidget(self.ik_pq2)
         self.prev_layout.addWidget(self.ik_pq3)
         self.prev_layout.addWidget(self.ik_pq4)
         self.prev_layout.addWidget(self.ik_pq5)
+        self.prev_layout.addWidget(QLabel("Joint continuity penalty:"))
+        self.prev_layout.addWidget(self.ik_jmp)
         layout.addLayout(self.prev_layout)
 
         layout.addStretch()
@@ -167,6 +175,7 @@ class IKProblemPanel(QWidget):
         self.ik_qx.setEnabled(checked)
         self.ik_qy.setEnabled(checked)
         self.ik_qz.setEnabled(checked)
+        self.ik_op.setEnabled(checked)
 
     def _toggle_prev_inputs(self, checked: bool):
         """Enables or disables previous posture inputs based on the checkbox."""
@@ -175,6 +184,7 @@ class IKProblemPanel(QWidget):
         self.ik_pq3.setEnabled(checked)
         self.ik_pq4.setEnabled(checked)
         self.ik_pq5.setEnabled(checked)
+        self.ik_jmp.setEnabled(checked)
 
     def update_ui(self, data: dict):
         """Fills the inputs using the specific IK defaults from benchmarks.py."""
@@ -198,6 +208,9 @@ class IKProblemPanel(QWidget):
             self.ik_pq4.setValue(p_p[3])
             self.ik_pq5.setValue(p_p[4])
 
+            self.ik_op.setValue(defaults.get("orientation_weight"))
+            self.ik_jmp.setValue(defaults.get("joint_motion_weight"))
+
     def get_params(self):
         """Packs IK specific parameters to be injected directly into the IKEvaluator."""
         return {
@@ -205,6 +218,8 @@ class IKProblemPanel(QWidget):
             "ik_target_xyz": [self.ik_tx.value(), self.ik_ty.value(), self.ik_tz.value()],
             "ik_use_quat": self.enable_quat_cb.isChecked(),
             "ik_target_quat": [self.ik_qw.value(), self.ik_qx.value(), self.ik_qy.value(), self.ik_qz.value()],
+            "ik_op_weight": self.ik_op.value(), # Send orientation weight
             "ik_use_prev": self.enable_prev_cb.isChecked(),
-            "ik_prev_posture": [self.ik_pq1.value(), self.ik_pq2.value(), self.ik_pq3.value(), self.ik_pq4.value(), self.ik_pq5.value()]
+            "ik_prev_posture": [self.ik_pq1.value(), self.ik_pq2.value(), self.ik_pq3.value(), self.ik_pq4.value(), self.ik_pq5.value()],
+            "ik_jmp_weight": self.ik_jmp.value() # Send joint motion weight
         }
