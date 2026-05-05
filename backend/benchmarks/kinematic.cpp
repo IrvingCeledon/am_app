@@ -158,7 +158,7 @@ Matrix multiply_matrix(const Matrix& A, const Matrix& B)
  *    T1 * T2 != T2 * T1
  *  - The order strictly follows the kinematic chain
  *  - Each matrix encodes both rotation and translation
- *  - The result is always a 4x4 matrix, NOT a scalar
+ *  - The result is always a 5x5 matrix, NOT a scalar
  */
 Matrix get_forward_kinematics(const std::vector<double>& q_values)
 {

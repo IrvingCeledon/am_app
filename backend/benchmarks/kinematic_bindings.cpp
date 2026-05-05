@@ -19,4 +19,7 @@ PYBIND11_MODULE(kinematic_module, m) {
          py::arg("jmp") = 0.5,
          py::arg("op") = 10.0)
     .def("__call__", &IKEvaluator::operator());
+
+    m.def("get_forward_kinematics", &get_forward_kinematics, "Calculates Homogeneous Transformation Matrix");
+    m.def("get_quaternion", &get_quaternion, "Extracts the 3x3 rotation matrix from a 5x5 Homogeneous matrix");
 }
