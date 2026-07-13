@@ -112,7 +112,7 @@ Matrix multiply_matrix(const Matrix& A, const Matrix& B)
  * θ_2 = q2          -> rotational joint (variable)
  * α_2 = π/2         -> fixed twist
  * b_2 = 0.4         -> constant link length
- * d_2 = 0
+ * d_2 = 0           -> no offset
  *
  * Link 3:
  * θ_3 = 0           -> no rotation
@@ -123,14 +123,14 @@ Matrix multiply_matrix(const Matrix& A, const Matrix& B)
  * Link 4:
  * θ_4 = q4          -> rotational joint (variable)
  * α_4 = -π/2        -> fixed twist
- * b_4 = 0
- * d_4 = 0
+ * b_4 = 0           -> no link length
+ * d_4 = 0           -> no offset
  *
  * Link 5:
  * θ_5 = q5          -> rotational joint (variable)
  * α_5 = π/2         -> fixed twist
  * b_5 = 0.3         -> constant link length
- * d_5 = 0
+ * d_5 = 0           -> no offset
  *
  *  ========================================
  *  Final Transformation
@@ -217,7 +217,7 @@ double get_articular(const std::vector<double>& q_olds, const std::vector<double
  * ========================================
  * Rotation Matrix to Quaternion Conversion
  * ========================================
- * Extracts the 3x3 rotation matrix from a 4x4 Homogeneous
+ * Extracts the 3x3 rotation matrix from a 5x5 Homogeneous
  * Transformation Matrix and converts it into a unit quaternion
  * [qw, qx, qy, qz].
  *
